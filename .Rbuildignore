@@ -1,0 +1,9 @@
+^.*\.pdf$
+^\.Rbuildignore$
+^.*\.Rproj$
+^\.Rproj\.user$
+^cran-comments\.md$
+^\.DS_Store$
+^alineR_debugging\.
+^.*\.log$
+^.*\.tex$

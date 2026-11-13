@@ -28,7 +28,7 @@ public:
     void pop( short k = 1 ) { top -= k; }
     void show();
     //void showAlign( Word *w, short row);   // Modified by G.S
-    void showAlign( Word *w, short row, char aback[50] );
+    void showAlign( Word *w, short row, char *aback );
 
 private:
     short stack[2][MAXL];	// trace description

@@ -155,7 +155,7 @@ int similarity( Word *wA, Word *wB, int vec[12], int skippen )  // Coefficient a
 
 // algorithm Y
 // made recursive in order to find all maximal solutions (not just one)
-void alignment( Word *wA, Word *wB, short i, short j, int T, int *getscore, char aback1[50], char aback2[50], int vec[12], int skippen )  // Modified by G.S.
+void alignment( Word *wA, Word *wB, short i, short j, int T, int *getscore, char *aback1, char *aback2, int vec[12], int skippen )  // Modified by G.S.
 {
     //short lenA = wA->phlen();
     //short lenB = wB->phlen();
@@ -167,7 +167,7 @@ void alignment( Word *wA, Word *wB, short i, short j, int T, int *getscore, char
     if ( i == 0 && j == 0 )
     {
 display:
-        assert( Score(i,j) == 0 );
+        ALINE_ASSERT( Score(i,j) == 0 );
         if ( allowed( &Out ) && !FallThru )
         {
             Out.push( LIM, LIM );
@@ -280,7 +280,7 @@ display:
 }
 
 // find all optimal alignments
-void align( Word *wA, Word *wB, int *getscore, char aback1[50], char aback2[50], int vec[12] , int skippen)
+void align( Word *wA, Word *wB, int *getscore, char *aback1, char *aback2, int vec[12] , int skippen)
 {
     //for(int test=0;test<12;test++) {printf("%d",coeff[test]);}; printf("\n"); This is for test!
     

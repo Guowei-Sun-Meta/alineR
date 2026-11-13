@@ -26,11 +26,12 @@
 
 #include <algorithm>
 #include <stdlib.h>
-#include <assert.h>
 #include <math.h>
 #include <time.h>
 
-const int MAXL = 40;        // max length of an input word
+// Buffer sizes. ELEN bounds the encoded (ASCII) word length; the other
+// limits are derived from it so that no alignment can overflow a buffer.
+const int ELEN = 61;        // max word representation length (+1 for NUL)
 const int LINELEN = 800;    // max input line length
 const int MAXS = 2400;      // max input size (in lines)
 const int BASE_UPP = 65;    // = ord('A')
@@ -40,8 +41,18 @@ const int NUL = -1;         // empty alignment
 const int LIM = -2;         // border character (for local comparison)
 const int DUB = -3;         // double linking (for compression)
 const int TAB = 4;          // output space for one phoneme
-const int PLEN = 42;        // max word phonemic length (+2)
-const int ELEN = 30;        // max word representation length
+const int PLEN = ELEN + 2;  // max word phonemic length (+2)
+const int MAXL = 2 * ELEN + 4;      // max alignment trace length / DP size
+const int ABACK = TAB * MAXL + 1;   // size of an alignment output buffer
 const int NSEG = 26;        // number of recognized segments
+
+// Internal consistency checks: raise an R error instead of abort()ing
+// the R session (assert() is not acceptable in CRAN packages).
+#ifndef R_NO_REMAP
+#define R_NO_REMAP
+#endif
+#include <R.h>
+#define ALINE_ASSERT(cond) \
+    do { if (!(cond)) Rf_error("alineR internal error: %s (%s:%d)", #cond, __FILE__, __LINE__); } while (0)
 
 #endif

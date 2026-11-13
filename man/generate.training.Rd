@@ -7,7 +7,7 @@ Generate training dataset
 Generates an output file of training data to be used by a linguist to select the best alignments from a list of the unique set of possible alignments for each given pair of words.
 }
 \usage{
-generate.training(raw.data, search.size=1000,table=TRUE,
+generate.training(raw.data, search.size=1000, table=FALSE,
                   file.out="candidate_alignments.csv")
 }
 %- maybe also 'usage' for other objects documented here.
@@ -19,7 +19,7 @@ This is a 2*n matrix containing n ipa encoded cognate pairs.
 Number of time to randomize feature parameters while searching for unique alignments.
 }
 \item{table}{
-table=TRUE will generate a csv file named by the user containing possible alignments in IPA encodings.
+If \code{TRUE}, write a CSV file (\code{file.out}) containing possible alignments in IPA encodings. Defaults to \code{FALSE} so that nothing is written unless requested.
 }
 \item{file.out}{
 Name of CSV file for output.
@@ -47,7 +47,8 @@ The function also returns an list containing two dataframes (IPA and Aline) that
 data<-data.frame(dog=c('dog','perro'),cat=c('cat','gato'),rat=c('rat','rata'))
 
 # write out a CSV file that can be openned in Excel and used for expert determinations
-M<-generate.training(raw.data=data,search.size=100,file="open.with.excel.csv")
+out <- file.path(tempdir(), "open.with.excel.csv")
+M<-generate.training(raw.data=data,search.size=100,table=TRUE,file.out=out)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

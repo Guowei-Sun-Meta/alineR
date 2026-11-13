@@ -19,7 +19,7 @@
 
 void Stack::push( short i1, short i2 )
 {
-    assert( top >= 0 && top < MAXL );
+    ALINE_ASSERT( top >= 0 && top < MAXL );
     stack[0][top] = i1;
     stack[1][top] = i2;
     top++;
@@ -39,7 +39,7 @@ void Stack::show()
 }
 
 
-void Stack::showAlign( Word *w, short row, char aback[50] )
+void Stack::showAlign( Word *w, short row, char *aback )
 //void Stack::showAlign( Word *w, short row)
 {
     short len = w->phlen();

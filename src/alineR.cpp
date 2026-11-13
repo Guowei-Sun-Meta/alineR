@@ -1,64 +1,93 @@
-#include <R.h>
-#include <Rdefines.h>
-#include <stdio.h>
-#include <string.h>
+// Copyright (c) 2015 by Sean Downey
+// Authors: Sean Downey (sean@codexdata.com) and Guowei Sun (gwsun@umd.edu)
+// This software is distributed under GPL-3.
+// Includes modified C++ code originally developed by Greg Kondrak (c) 2000
 
 #include "glob.h"
 #include "Word.h"
 #include "wagner.h"
 
-extern "C"{
-  
-  SEXP exchange(SEXP s, SEXP coeff, SEXP skpen){
-    //first line is for test  int a=20;char aback1[20];char aback2[20];strcpy(aback1,"tu");strcpy(aback2,"tuF");printf("look at the returns:\n");printf("%s %s %d\n",aback1,aback2,a);
-    
-    // now we have to deal with the input, give the string value to two vectors
-    char s1[20], s2[20];
-    strcpy(s1,CHAR(STRING_ELT(s,0)));
-    strcpy(s2,CHAR(STRING_ELT(s,1)));
-    int vec[13]; for(int i=0;i<13;i++) vec[i]=INTEGER(coeff)[i]; //printf("%d\n",vec[11]);
-    int SkipPen=INTEGER(skpen)[0];     //printf("the skip penalty input:%d\n",SkipPen);
+#ifndef R_NO_REMAP
+#define R_NO_REMAP
+#endif
+#include <R.h>
+#include <Rinternals.h>
 
-        int a=0;
-        int *score;
-        score=&a;
-        //int vec[12]={1,2,3,4,5,6,7,8,9,0,11,12};
-        char aback1[50];
-        char aback2[50];
+// Number of feature weights passed from R (Syllabic ... Round).
+static const int NFEAT = 12;
 
-        Word::applyRedundancyRules();
-        Word* w1 = new Word(s1);
-        Word* w2 = new Word(s2);
-        align( w1, w2,score, aback1, aback2, vec, SkipPen);
-        delete w1;
-        delete w2;
-        
-        //printf("look at the outputs from character functions:\n");printf("%s\n",aback1);printf("%s\n",aback2); printf("The score: %d\n",a);       
-        a=*score;
+// Modifier codes understood by Word::modify().
+static const char *MODIFIERS = "ACDFHLNPSVX";
 
-    
-    
-    // This is the output part, where a list is now successfully returned!
-    SEXP alignment1=PROTECT(allocVector(STRSXP,1));
-    SEXP alignment2=PROTECT(allocVector(STRSXP,1));
-    SEXP simscore=PROTECT(allocVector(REALSXP,1));
-    SEXP result=PROTECT(allocVector(VECSXP,3));
-    SET_STRING_ELT(alignment1,0,mkChar(aback1));
-    SET_STRING_ELT(alignment2,0,mkChar(aback2));
-    REAL(simscore)[0]=a;
-    SET_VECTOR_ELT(result,0,alignment1);
-    SET_VECTOR_ELT(result,1,alignment2);
-    SET_VECTOR_ELT(result,2,simscore);
-    UNPROTECT(4);
-    return(result);
-  }
-  
-  
+// Validate an encoded ALINE word before handing it to the C++ code, so that
+// bad input produces an R error rather than a buffer overflow or abort().
+static void check_word(const char *w, int which)
+{
+    size_t n = strlen(w);
+    if (n == 0)
+        Rf_error("word %d is empty after encoding (all characters invalid?)", which);
+    if (n >= (size_t) ELEN)
+        Rf_error("word %d is too long: %d encoded characters (maximum is %d)",
+                 which, (int) n, ELEN - 1);
+    if (w[0] < 'a' || w[0] > 'z')
+        Rf_error("word %d must start with a segment (a-z), not '%c'", which, w[0]);
+    for (size_t i = 1; i < n; i++) {
+        char c = w[i];
+        if ((c < 'a' || c > 'z') && (c == '\0' || strchr(MODIFIERS, c) == NULL))
+            Rf_error("word %d contains invalid encoded character '%c'", which, c);
+    }
+}
+
+extern "C" {
+
+SEXP exchange(SEXP s, SEXP coeff, SEXP skpen)
+{
+    if (TYPEOF(s) != STRSXP || XLENGTH(s) != 2)
+        Rf_error("'s' must be a character vector of length 2");
+    if (STRING_ELT(s, 0) == NA_STRING || STRING_ELT(s, 1) == NA_STRING)
+        Rf_error("NA words are not allowed");
+    if (TYPEOF(coeff) != INTSXP || XLENGTH(coeff) != NFEAT)
+        Rf_error("feature weights must be an integer vector of length %d", NFEAT);
+    if (TYPEOF(skpen) != INTSXP || XLENGTH(skpen) != 1)
+        Rf_error("skip penalty must be a single integer");
+    for (int i = 0; i < NFEAT; i++)
+        if (INTEGER(coeff)[i] == NA_INTEGER)
+            Rf_error("feature weights must not be NA");
+    if (INTEGER(skpen)[0] == NA_INTEGER)
+        Rf_error("skip penalty must not be NA");
+
+    const char *s1 = CHAR(STRING_ELT(s, 0));
+    const char *s2 = CHAR(STRING_ELT(s, 1));
+    check_word(s1, 1);
+    check_word(s2, 2);
+
+    int vec[NFEAT];
+    for (int i = 0; i < NFEAT; i++) vec[i] = INTEGER(coeff)[i];
+    int SkipPen = INTEGER(skpen)[0];
+
+    int score = 0;
+    char aback1[ABACK];
+    char aback2[ABACK];
+    aback1[0] = '\0';
+    aback2[0] = '\0';
+
+    Word::applyRedundancyRules();   // idempotent
+    // Automatic storage: nothing leaks if an R error is raised below.
+    Word w1(s1);
+    Word w2(s2);
+    align(&w1, &w2, &score, aback1, aback2, vec, SkipPen);
+
+    SEXP result = PROTECT(Rf_allocVector(VECSXP, 3));
+    SET_VECTOR_ELT(result, 0, Rf_mkString(aback1));
+    SET_VECTOR_ELT(result, 1, Rf_mkString(aback2));
+    SET_VECTOR_ELT(result, 2, Rf_ScalarReal((double) score));
+    UNPROTECT(1);
+    return result;
+}
+
 }
 
 float gP::ScoreMargin = 1.0;
-int gP::MaxScore = conv(35); 
+int gP::MaxScore = conv(35);
 int gP::MaxCmpScore = conv(45);
-//int gP::SkipCost = conv(10);
 int gP::VwlDecr = conv(10);
-//int gP::SalCoef[FT_LEN] = { 5, 40, 50, 10, 10, 10, 10, 5, 1, 5, 5, 5, 10 };
