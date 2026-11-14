@@ -1636,7 +1636,7 @@ of reproducibility and CRAN package checks.</p>
 <div id="aliner-replay-and-debugging-log" class="section level2">
 <h2>alineR Replay and Debugging Log</h2>
 <p>Install archived package</p>
-<pre class="r"><code>install.packages(&quot;~/Documents/research/alineR/alineR_archive/alineR_1.1.4.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)
+<pre class="r"><code>install.packages(&quot;~/Documents/alineR/alineR_archive/alineR_1.1.4.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)
 library(alineR)</code></pre>
 <p>Confirm we can reproduce previous results</p>
 <pre class="r"><code>aline(&quot;kərampu&quot;, &quot;ləməntuŋ&quot;)
@@ -1762,8 +1762,8 @@ else:</p>
 <pre class="cpp"><code>if (TYPEOF(coeff) != INTSXP || LENGTH(coeff) != 12)
     Rf_error(&quot;feature weights must be an integer vector of length 12&quot;);
 int vec[12]; for(int i=0;i&lt;12;i++) vec[i]=INTEGER(coeff)[i];</code></pre>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226">64e665a</a>
-(diff against the <a href="https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10">untouched
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/86c8a42738b6d59c228b92ddd2267d005c42141d">86c8a42</a>
+(diff against the <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/dba2ff881c7829d9d971b1875e7828f63637c9e8">untouched
 baseline</a>).</p>
 <p><strong>Verified.</strong> All reference outputs identical to step 0.
 Passing 13 weights now gives an R error. <code>R CMD check</code>
@@ -1794,7 +1794,7 @@ CSV to <code>tempdir()</code>:</p>
                               file.out = &quot;candidate_alignments.csv&quot;)</code></pre>
 <pre class="r"><code>out &lt;- file.path(tempdir(), &quot;open.with.excel.csv&quot;)
 M &lt;- generate.training(raw.data = data, search.size = 100, table = TRUE, file.out = out)</code></pre>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d">e2be357</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/128173394a0b89b07b99b3dd90badb7109c671e9">1281733</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
 <code>1 WARNING, 2 NOTEs</code> (was <code>1 WARNING, 3 NOTEs</code>);
 “non-standard things in the check directory” now OK and no CSV files
@@ -1826,7 +1826,7 @@ the version in <code>inst/CITATION</code>.</li>
 <p>The earlier, discarded fix attempt’s git tag
 <code>alineR-1.1.5</code> and branch <code>alineR-cran-1.1.5</code> were
 deleted so the name refers only to this release.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5">5f016bf</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/45cacfbe0fa50f307bb03d905dfebf6faa60b66a">45cacfb</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
 <code>0 WARNINGs, 3 NOTEs</code> (was <code>1 WARNING, 2 NOTEs</code>).
 The incoming-feasibility check is now a NOTE: the expected “New
@@ -1856,7 +1856,7 @@ malformed <code>doi://dx.doi.org/...</code> (now
 <code>\doi{10.1080/09296170802326681}</code>), and the
 <code>DESCRIPTION</code> text was missing a closing parenthesis.</li>
 </ul>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b">36d02b5</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/6ddb544cc38d3ac00a1811598294f253dc7522cb">6ddb544</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
 <code>0 WARNINGs, 3 NOTEs</code>; the incoming NOTE no longer lists
 URLs, only the expected “New submission / Package was archived on CRAN”.
@@ -1877,7 +1877,7 @@ i.e. <code>alineR-package</code>.</p>
 \alias{alineR}</code></pre>
 <p>The extra <code>alineR</code> alias makes <code>?alineR</code> open
 the overview page.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38">c26891b</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/97a7dc90467dea62ccffadfe05df084e55eee35a">97a7dc9</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
 <code>0 WARNINGs, 2 NOTEs</code> (was 3); “Rd metadata” OK.
 <code>?&quot;alineR-package&quot;</code> and <code>?alineR</code> both resolve.
@@ -1890,7 +1890,7 @@ contents): “Auto-generated content requiring editing” in
 over from the <code>prompt()</code> template.</p>
 <p><strong>Fix.</strong> Deleted the two placeholder lines from each
 file.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da">4aef4e2</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/0bf502b13f0b17466e42c781cba1a8410ff95fd3">0bf502b</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
 <code>0 WARNINGs, 1 NOTE</code> (was 2). The remaining NOTE is the CRAN
 incoming one (“New submission / Package was archived on CRAN”), which
@@ -1960,7 +1960,7 @@ const int ABACK = TAB * MAXL + 1; // output: &lt;= TAB chars per entry</code></p
 R error, and the output buffers are <code>char[ABACK]</code>. Array
 parameters are declared <code>char *</code> instead of
 <code>char[50]</code>.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b">75aff80</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/1176c73055f40046cd5310bfd419698242050f46">1176c73</a></p>
 <p><strong>Verified.</strong></p>
 <ul>
 <li>Probe: every length 8-60 aligns correctly (all segments present,
@@ -2054,7 +2054,7 @@ skip penalty must be a single non-missing number</code></pre>
 That is how the <code>@</code> placeholder of
 <code>aline(mark = TRUE)</code> works, so it keeps working for unknown
 characters inside a word.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d">34e5433</a></p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/alineR/commit/b0298da60158ef121575245f584332f1307ae65b">b0298da</a></p>
 <p><strong>Verified.</strong> UBSan/ASan clean on all malformed inputs
 and all examples. Paper reference outputs and the full differential test
 (1,500 pairs, all exported functions) identical to fix 7.

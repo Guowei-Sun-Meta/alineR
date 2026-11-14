@@ -16,15 +16,15 @@ Bringing [alineR](https://cran.r-project.org/package=alineR) back to CRAN (archi
 
 ## Issues
 
-Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10) (untouched 1.1.4), so its link shows only the package code change. Documentation is committed separately.
+Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Meta/alineR/commit/dba2ff881c7829d9d971b1875e7828f63637c9e8) (untouched 1.1.4), so its link shows only the package code change. Documentation is committed separately.
 
 | # | Issue | Why it matters | Status | Change |
 |:--|:--|:--|:--|:--|
-| 1 | C++ reads 13 weights from a 12-element vector | Caused archival (valgrind) | Fixed | [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) |
-| 2 | Examples write CSV files to the working directory | Caused archival | Fixed | [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d) |
-| 3 | Version equals archived 1.1.4 | Blocks resubmission | Fixed | [5f016bf](https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5) |
-| 4 | Two moved URLs | NOTE | Fixed | [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b) |
-| 5 | Invalid package alias `aline-package` | NOTE | Fixed | [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38) |
-| 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Fixed | [4aef4e2](https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da) |
-| 7 | Buffer overflow on long words | Wrong results / crash | Fixed | [75aff80](https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b) |
-| 8 | Invalid input (empty word, bad code, NA weight) reaches C++ unchecked | Out-of-bounds write / garbage | Fixed | [34e5433](https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d) |
+| 1 | C++ reads 13 weights from a 12-element vector | Caused archival (valgrind) | Fixed | [86c8a42](https://github.com/Guowei-Sun-Meta/alineR/commit/86c8a42738b6d59c228b92ddd2267d005c42141d) |
+| 2 | Examples write CSV files to the working directory | Caused archival | Fixed | [1281733](https://github.com/Guowei-Sun-Meta/alineR/commit/128173394a0b89b07b99b3dd90badb7109c671e9) |
+| 3 | Version equals archived 1.1.4 | Blocks resubmission | Fixed | [45cacfb](https://github.com/Guowei-Sun-Meta/alineR/commit/45cacfbe0fa50f307bb03d905dfebf6faa60b66a) |
+| 4 | Two moved URLs | NOTE | Fixed | [6ddb544](https://github.com/Guowei-Sun-Meta/alineR/commit/6ddb544cc38d3ac00a1811598294f253dc7522cb) |
+| 5 | Invalid package alias `aline-package` | NOTE | Fixed | [97a7dc9](https://github.com/Guowei-Sun-Meta/alineR/commit/97a7dc90467dea62ccffadfe05df084e55eee35a) |
+| 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Fixed | [0bf502b](https://github.com/Guowei-Sun-Meta/alineR/commit/0bf502b13f0b17466e42c781cba1a8410ff95fd3) |
+| 7 | Buffer overflow on long words | Wrong results / crash | Fixed | [1176c73](https://github.com/Guowei-Sun-Meta/alineR/commit/1176c73055f40046cd5310bfd419698242050f46) |
+| 8 | Invalid input (empty word, bad code, NA weight) reaches C++ unchecked | Out-of-bounds write / garbage | Fixed | [b0298da](https://github.com/Guowei-Sun-Meta/alineR/commit/b0298da60158ef121575245f584332f1307ae65b) |

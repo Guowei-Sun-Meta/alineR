@@ -31,8 +31,8 @@ ships a 2006 `tidy`); CRAN has a current one. To skip it locally:
 ## 1. Get the source and build
 
 ```bash
-git clone https://github.com/Guowei-Sun-Meta/research.git
-cd research/alineR
+git clone https://github.com/Guowei-Sun-Meta/alineR.git
+cd alineR
 R CMD build alineR            # -> alineR_1.1.5.tar.gz
 ```
 

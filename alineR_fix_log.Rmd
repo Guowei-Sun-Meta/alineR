@@ -16,7 +16,7 @@ This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages
 ## alineR Replay and Debugging Log
 Install archived package 
 ```R
-install.packages("~/Documents/research/alineR/alineR_archive/alineR_1.1.4.tar.gz", repos = NULL, type = "source")
+install.packages("~/Documents/alineR/alineR_archive/alineR_1.1.4.tar.gz", repos = NULL, type = "source")
 library(alineR)
 ```
 
@@ -87,7 +87,7 @@ if (TYPEOF(coeff) != INTSXP || LENGTH(coeff) != 12)
 int vec[12]; for(int i=0;i<12;i++) vec[i]=INTEGER(coeff)[i];
 ```
 
-**GitHub:** [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) (diff against the [untouched baseline](https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10)).
+**GitHub:** [86c8a42](https://github.com/Guowei-Sun-Meta/alineR/commit/86c8a42738b6d59c228b92ddd2267d005c42141d) (diff against the [untouched baseline](https://github.com/Guowei-Sun-Meta/alineR/commit/dba2ff881c7829d9d971b1875e7828f63637c9e8)).
 
 **Verified.** All reference outputs identical to step 0. Passing 13 weights now
 gives an R error. `R CMD check` unchanged (`1 WARNING, 3 NOTEs`), as expected

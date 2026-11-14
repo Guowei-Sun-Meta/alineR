@@ -18,7 +18,7 @@ This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages
 ## alineR Replay and Debugging Log
 Install archived package 
 ```R
-install.packages("~/Documents/research/alineR/alineR_archive/alineR_1.1.4.tar.gz", repos = NULL, type = "source")
+install.packages("~/Documents/alineR/alineR_archive/alineR_1.1.4.tar.gz", repos = NULL, type = "source")
 library(alineR)
 ```
 
@@ -94,7 +94,7 @@ if (TYPEOF(coeff) != INTSXP || LENGTH(coeff) != 12)
 int vec[12]; for(int i=0;i<12;i++) vec[i]=INTEGER(coeff)[i];
 ```
 
-**GitHub:** [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) (diff against the [untouched baseline](https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10)).
+**GitHub:** [86c8a42](https://github.com/Guowei-Sun-Meta/alineR/commit/86c8a42738b6d59c228b92ddd2267d005c42141d) (diff against the [untouched baseline](https://github.com/Guowei-Sun-Meta/alineR/commit/dba2ff881c7829d9d971b1875e7828f63637c9e8)).
 
 **Verified.** All reference outputs identical to step 0. Passing 13 weights now
 gives an R error. `R CMD check` unchanged (`1 WARNING, 3 NOTEs`), as expected
@@ -124,7 +124,7 @@ out <- file.path(tempdir(), "open.with.excel.csv")
 M <- generate.training(raw.data = data, search.size = 100, table = TRUE, file.out = out)
 ```
 
-**GitHub:** [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d)
+**GitHub:** [1281733](https://github.com/Guowei-Sun-Meta/alineR/commit/128173394a0b89b07b99b3dd90badb7109c671e9)
 
 **Verified.** `R CMD check`: `1 WARNING, 2 NOTEs` (was `1 WARNING, 3 NOTEs`);
 "non-standard things in the check directory" now OK and no CSV files left in
@@ -155,7 +155,7 @@ from 2017 (`Packaged`, `Repository`, `Date/Publication`). Also:
 The earlier, discarded fix attempt's git tag `alineR-1.1.5` and branch
 `alineR-cran-1.1.5` were deleted so the name refers only to this release.
 
-**GitHub:** [5f016bf](https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5)
+**GitHub:** [45cacfb](https://github.com/Guowei-Sun-Meta/alineR/commit/45cacfbe0fa50f307bb03d905dfebf6faa60b66a)
 
 **Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs` (was `1 WARNING, 2 NOTEs`).
 The incoming-feasibility check is now a NOTE: the expected "New submission /
@@ -180,7 +180,7 @@ Package was archived on CRAN" text, plus the moved URLs (issue 4).
   `doi://dx.doi.org/...` (now `\doi{10.1080/09296170802326681}`), and the
   `DESCRIPTION` text was missing a closing parenthesis.
 
-**GitHub:** [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b)
+**GitHub:** [6ddb544](https://github.com/Guowei-Sun-Meta/alineR/commit/6ddb544cc38d3ac00a1811598294f253dc7522cb)
 
 **Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs`; the incoming NOTE no
 longer lists URLs, only the expected "New submission / Package was archived on
@@ -203,7 +203,7 @@ the alias `<package>-package`, i.e. `alineR-package`.
 
 The extra `alineR` alias makes `?alineR` open the overview page.
 
-**GitHub:** [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38)
+**GitHub:** [97a7dc9](https://github.com/Guowei-Sun-Meta/alineR/commit/97a7dc90467dea62ccffadfe05df084e55eee35a)
 
 **Verified.** `R CMD check`: `0 WARNINGs, 2 NOTEs` (was 3); "Rd metadata" OK.
 `?"alineR-package"` and `?alineR` both resolve.
@@ -216,7 +216,7 @@ from the `prompt()` template.
 
 **Fix.** Deleted the two placeholder lines from each file.
 
-**GitHub:** [4aef4e2](https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da)
+**GitHub:** [0bf502b](https://github.com/Guowei-Sun-Meta/alineR/commit/0bf502b13f0b17466e42c781cba1a8410ff95fd3)
 
 **Verified.** `R CMD check`: `0 WARNINGs, 1 NOTE` (was 2). The remaining NOTE
 is the CRAN incoming one ("New submission / Package was archived on CRAN"),
@@ -261,7 +261,7 @@ In `src/alineR.cpp` the words are no longer copied into `char[20]`; words of
 more than 60 encoded characters raise an R error, and the output buffers are
 `char[ABACK]`. Array parameters are declared `char *` instead of `char[50]`.
 
-**GitHub:** [75aff80](https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b)
+**GitHub:** [1176c73](https://github.com/Guowei-Sun-Meta/alineR/commit/1176c73055f40046cd5310bfd419698242050f46)
 
 **Verified.**
 
@@ -322,7 +322,7 @@ Unknown codes after the first character remain ignored, as in 1.1.4. That is
 how the `@` placeholder of `aline(mark = TRUE)` works, so it keeps working for
 unknown characters inside a word.
 
-**GitHub:** [34e5433](https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d)
+**GitHub:** [b0298da](https://github.com/Guowei-Sun-Meta/alineR/commit/b0298da60158ef121575245f584332f1307ae65b)
 
 **Verified.** UBSan/ASan clean on all malformed inputs and all examples.
 Paper reference outputs and the full differential test (1,500 pairs, all
