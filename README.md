@@ -18,7 +18,7 @@ Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Me
 | # | Issue | Why it matters | Status | Change |
 |:--|:--|:--|:--|:--|
 | 1 | C++ reads 13 weights from a 12-element vector | Caused archival (valgrind) | Fixed | [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) |
-| 2 | Examples write CSV files to the working directory | Caused archival | Open |  |
+| 2 | Examples write CSV files to the working directory | Caused archival | Fixed | [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d) |
 | 3 | Version equals archived 1.1.4 | Blocks resubmission | Open |  |
 | 4 | Two moved URLs | WARNING | Open |  |
 | 5 | Invalid package alias `aline-package` | NOTE | Open |  |

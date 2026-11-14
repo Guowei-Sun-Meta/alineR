@@ -48,7 +48,7 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | # | Problem | Source | Status |
 |:--|:--------|:-------|:-------|
 | 1 | C++ reads 13 feature weights from a 12-element vector | CRAN valgrind (cause of archival) | Fixed (2026-11-14) |
-| 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Open |
+| 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Fixed (2026-11-14) |
 | 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Open |
 | 4 | Two URLs moved (301): Kondrak homepage, R Journal article | WARNING, CRAN incoming feasibility | Open |
 | 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
@@ -102,3 +102,33 @@ gives an R error. `R CMD check` unchanged (`1 WARNING, 3 NOTEs`), as expected
 since this bug only shows under valgrind. Final confirmation needs a valgrind
 run (rhub `valgrind` platform), since valgrind is not available on macOS.
 
+### Fix 2: examples write CSV files to the working directory (2026-11-14)
+
+**Problem.** CRAN's check NOTE "non-standard things in the check directory"
+listed `candidate_alignments.csv` and `open.with.excel.csv`. CRAN policy does
+not allow writing to the user's file space unless asked. Two sources:
+
+- `generate.training()` defaulted to `table = TRUE`, so the `optimize.features`
+  example wrote `candidate_alignments.csv`, although its comment says "(not written)".
+- The `generate.training` example wrote `open.with.excel.csv` to the working directory.
+
+**Fix.** Default `table = FALSE` in `generate.training()` (code and Rd), and
+write the example's CSV to `tempdir()`:
+
+```r
+generate.training <- function(raw.data, search.size = 1000, table = FALSE,
+                              file.out = "candidate_alignments.csv")
+```
+
+```r
+out <- file.path(tempdir(), "open.with.excel.csv")
+M <- generate.training(raw.data = data, search.size = 100, table = TRUE, file.out = out)
+```
+
+**GitHub:** [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d)
+
+**Verified.** `R CMD check`: `1 WARNING, 2 NOTEs` (was `1 WARNING, 3 NOTEs`);
+"non-standard things in the check directory" now OK and no CSV files left in
+the check directory. A default `generate.training()` call writes no files;
+`table = TRUE` still writes `file.out`. Note: users who relied on the old
+default must now pass `table = TRUE`.

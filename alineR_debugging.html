@@ -1680,7 +1680,7 @@ vector</td>
 <td align="left">Examples write <code>candidate_alignments.csv</code>,
 <code>open.with.excel.csv</code> into the working directory</td>
 <td align="left">CRAN NOTE (cause of archival)</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
@@ -1761,6 +1761,37 @@ unchanged (<code>1 WARNING, 3 NOTEs</code>), as expected since this bug
 only shows under valgrind. Final confirmation needs a valgrind run (rhub
 <code>valgrind</code> platform), since valgrind is not available on
 macOS.</p>
+</div>
+<div id="fix-2-examples-write-csv-files-to-the-working-directory-2026-11-14" class="section level3">
+<h3>Fix 2: examples write CSV files to the working directory
+(2026-11-14)</h3>
+<p><strong>Problem.</strong> CRAN’s check NOTE “non-standard things in
+the check directory” listed <code>candidate_alignments.csv</code> and
+<code>open.with.excel.csv</code>. CRAN policy does not allow writing to
+the user’s file space unless asked. Two sources:</p>
+<ul>
+<li><code>generate.training()</code> defaulted to
+<code>table = TRUE</code>, so the <code>optimize.features</code> example
+wrote <code>candidate_alignments.csv</code>, although its comment says
+“(not written)”.</li>
+<li>The <code>generate.training</code> example wrote
+<code>open.with.excel.csv</code> to the working directory.</li>
+</ul>
+<p><strong>Fix.</strong> Default <code>table = FALSE</code> in
+<code>generate.training()</code> (code and Rd), and write the example’s
+CSV to <code>tempdir()</code>:</p>
+<pre class="r"><code>generate.training &lt;- function(raw.data, search.size = 1000, table = FALSE,
+                              file.out = &quot;candidate_alignments.csv&quot;)</code></pre>
+<pre class="r"><code>out &lt;- file.path(tempdir(), &quot;open.with.excel.csv&quot;)
+M &lt;- generate.training(raw.data = data, search.size = 100, table = TRUE, file.out = out)</code></pre>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d">e2be357</a></p>
+<p><strong>Verified.</strong> <code>R CMD check</code>:
+<code>1 WARNING, 2 NOTEs</code> (was <code>1 WARNING, 3 NOTEs</code>);
+“non-standard things in the check directory” now OK and no CSV files
+left in the check directory. A default <code>generate.training()</code>
+call writes no files; <code>table = TRUE</code> still writes
+<code>file.out</code>. Note: users who relied on the old default must
+now pass <code>table = TRUE</code>.</p>
 </div>
 </div>
 
