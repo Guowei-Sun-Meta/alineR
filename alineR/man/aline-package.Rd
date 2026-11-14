@@ -1,6 +1,7 @@
-\name{aline-package}
+\name{alineR-package}
 \docType{package}
-\alias{aline-package}
+\alias{alineR-package}
+\alias{alineR}
 \title{
 Alignment of Phonetic Sequence Using the 'ALINE' Algorithm
 }
