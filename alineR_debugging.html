@@ -1649,7 +1649,7 @@ aline(c(&quot;ũmlatʃ&quot;,&quot;dinnira&quot;), c(&quot;omlatʃ&quot;,&quot;d
 CRAN source in <code>alineR_archive/alineR_1.1.4/</code>). Each fix is
 checked with:</p>
 <pre class="text"><code>R CMD build alineR
-R CMD check --as-cran --no-manual alineR_&lt;version&gt;.tar.gz   # 1.1.4 until fix 3, then 1.1.5</code></pre>
+R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz</code></pre>
 <div id="issue-list" class="section level3">
 <h3>Issue list</h3>
 <table>
@@ -1686,21 +1686,20 @@ vector</td>
 <td align="left">3</td>
 <td align="left">Version 1.1.4 equals the archived version</td>
 <td align="left">WARNING, CRAN incoming feasibility</td>
-<td align="left">Fixed (2026-11-14)</td>
+<td align="left">Open</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
 <td align="left">Two URLs moved (301): Kondrak homepage, R Journal
 article</td>
-<td align="left">NOTE, CRAN incoming feasibility (part of the WARNING
-before fix 3)</td>
-<td align="left">Fixed (2026-11-14)</td>
+<td align="left">WARNING, CRAN incoming feasibility</td>
+<td align="left">Open</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
 <td align="left">Invalid package alias <code>aline-package</code></td>
 <td align="left">NOTE, Rd metadata</td>
-<td align="left">Fixed (2026-11-14)</td>
+<td align="left">Open</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
@@ -1708,7 +1707,7 @@ before fix 3)</td>
 <code>~kwd2</code> in <code>features.plot.Rd</code>,
 <code>optimization.GA.Rd</code></td>
 <td align="left">NOTE, Rd contents</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
@@ -1794,85 +1793,22 @@ call writes no files; <code>table = TRUE</code> still writes
 <code>file.out</code>. Note: users who relied on the old default must
 now pass <code>table = TRUE</code>.</p>
 </div>
-<div id="fix-3-version-equals-the-archived-version-2026-11-14" class="section level3">
-<h3>Fix 3: version equals the archived version (2026-11-14)</h3>
-<p><strong>Problem.</strong> The CRAN incoming check gave a WARNING:
-“Insufficient package version (submitted: 1.1.4, existing: 1.1.4)” and
-“The Date field is over a month old”. CRAN rejects a resubmission with
-an unchanged version.</p>
-<p><strong>Fix.</strong> Version 1.1.5 (patch release). In
-<code>DESCRIPTION</code>:</p>
-<pre class="text"><code>Version: 1.1.5
-Date: 2026-11-14</code></pre>
-<p>and removed the fields CRAN and <code>R CMD build</code> add
-themselves, which were stale from 2017 (<code>Packaged</code>,
-<code>Repository</code>, <code>Date/Publication</code>). Also:</p>
-<ul>
-<li>Removed the CRAN-generated <code>MD5</code> file: it no longer
-matched the sources after fixes 1-2 (<code>tools::checkMD5sums()</code>
-was FALSE) and is regenerated on build.</li>
-<li>Updated the version/date in <code>man/aline-package.Rd</code> and
-the version in <code>inst/CITATION</code>.</li>
-</ul>
-<p>The earlier, discarded fix attempt’s git tag
-<code>alineR-1.1.5</code> and branch <code>alineR-cran-1.1.5</code> were
-deleted so the name refers only to this release.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5">5f016bf</a></p>
-<p><strong>Verified.</strong> <code>R CMD check</code>:
-<code>0 WARNINGs, 3 NOTEs</code> (was <code>1 WARNING, 2 NOTEs</code>).
-The incoming-feasibility check is now a NOTE: the expected “New
-submission / Package was archived on CRAN” text, plus the moved URLs
-(issue 4).</p>
-</div>
-<div id="fix-4-moved-urls-2026-11-14" class="section level3">
-<h3>Fix 4: moved URLs (2026-11-14)</h3>
-<p><strong>Problem.</strong> The CRAN incoming check listed two URLs
-answering <code>301 Moved Permanently</code>: the R Journal article
-(<code>https://journal.r-project.org/archive/2017/RJ-2017-005/index.html</code>,
-in <code>DESCRIPTION</code>, <code>man/aline-package.Rd</code>,
-<code>inst/CITATION</code>) and Kondrak’s homepage
-(<code>http://webdocs.cs.ualberta.ca/~kondrak/</code>, in
-<code>man/aline-package.Rd</code>).</p>
-<p><strong>Fix.</strong></p>
-<ul>
-<li>R Journal article: replaced by its DOI,
-<code>10.32614/RJ-2017-005</code> (<code>&lt;doi:...&gt;</code> in
-<code>DESCRIPTION</code>, <code>\doi{}</code> in Rd, <code>doi =</code>
-in <code>CITATION</code>). CRAN prefers DOIs, and DOIs are not flagged
-when the publisher moves pages.</li>
-<li>Kondrak’s homepage now answers <code>410 Gone</code> with no
-successor, so the link is dropped; the acknowledgement stays.</li>
-<li>Same category, not flagged by CRAN: the 2008 reference had a
-malformed <code>doi://dx.doi.org/...</code> (now
-<code>\doi{10.1080/09296170802326681}</code>), and the
-<code>DESCRIPTION</code> text was missing a closing parenthesis.</li>
-</ul>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b">36d02b5</a></p>
-<p><strong>Verified.</strong> <code>R CMD check</code>:
-<code>0 WARNINGs, 3 NOTEs</code>; the incoming NOTE no longer lists
-URLs, only the expected “New submission / Package was archived on CRAN”.
-<code>citation(&quot;alineR&quot;)</code> and the package help page show working
-DOIs.</p>
-</div>
-<div id="fix-5-invalid-package-alias-2026-11-14" class="section level3">
-<h3>Fix 5: invalid package alias (2026-11-14)</h3>
+<div id="fix-6-template-keywords-in-rd-files-2026-11-14" class="section level3">
+<h3>Fix 6: template keywords in Rd files (2026-11-14)</h3>
 <p><strong>Problem.</strong> <code>R CMD check</code> NOTE (Rd
-metadata): “Invalid package aliases in Rd file ‘aline-package.Rd’:
-‘aline-package’”. The package overview page must have the alias
-<code>&lt;package&gt;-package</code>,
-i.e. <code>alineR-package</code>.</p>
-<p><strong>Fix.</strong> In <code>man/aline-package.Rd</code>:</p>
-<pre class="text"><code>\name{alineR-package}
-\docType{package}
-\alias{alineR-package}
-\alias{alineR}</code></pre>
-<p>The extra <code>alineR</code> alias makes <code>?alineR</code> open
-the overview page.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38">c26891b</a></p>
+contents): “Auto-generated content requiring editing” in
+<code>man/features.plot.Rd</code> and
+<code>man/optimization.GA.Rd</code>: the placeholder keywords
+<code>\keyword{ ~kwd1 }</code> and <code>\keyword{ ~kwd2 }</code> left
+over from the <code>prompt()</code> template.</p>
+<p><strong>Fix.</strong> Deleted the two placeholder lines from each
+file.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da">4aef4e2</a></p>
 <p><strong>Verified.</strong> <code>R CMD check</code>:
-<code>0 WARNINGs, 2 NOTEs</code> (was 3); “Rd metadata” OK.
-<code>?&quot;alineR-package&quot;</code> and <code>?alineR</code> both
-resolve.</p>
+<code>0 WARNINGs, 1 NOTE</code> (was 2). The remaining NOTE is the CRAN
+incoming one (“New submission / Package was archived on CRAN”), which
+every resubmission of an archived package gets and which is explained in
+the submission comments rather than fixed.</p>
 </div>
 </div>
 
