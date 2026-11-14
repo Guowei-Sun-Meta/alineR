@@ -51,7 +51,7 @@ R CMD check --as-cran --no-manual alineR_<version>.tar.gz   # 1.1.4 until fix 3,
 | 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Fixed (2026-11-14) |
 | 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Fixed (2026-11-14) |
 | 4 | Two URLs moved (301): Kondrak homepage, R Journal article | NOTE, CRAN incoming feasibility (part of the WARNING before fix 3) | Fixed (2026-11-14) |
-| 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
+| 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Fixed (2026-11-14) |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Open |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Open |
 
@@ -186,3 +186,25 @@ Package was archived on CRAN" text, plus the moved URLs (issue 4).
 **Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs`; the incoming NOTE no
 longer lists URLs, only the expected "New submission / Package was archived on
 CRAN". `citation("alineR")` and the package help page show working DOIs.
+
+### Fix 5: invalid package alias (2026-11-14)
+
+**Problem.** `R CMD check` NOTE (Rd metadata): "Invalid package aliases in Rd
+file 'aline-package.Rd': 'aline-package'". The package overview page must have
+the alias `<package>-package`, i.e. `alineR-package`.
+
+**Fix.** In `man/aline-package.Rd`:
+
+```text
+\name{alineR-package}
+\docType{package}
+\alias{alineR-package}
+\alias{alineR}
+```
+
+The extra `alineR` alias makes `?alineR` open the overview page.
+
+**GitHub:** [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38)
+
+**Verified.** `R CMD check`: `0 WARNINGs, 2 NOTEs` (was 3); "Rd metadata" OK.
+`?"alineR-package"` and `?alineR` both resolve.

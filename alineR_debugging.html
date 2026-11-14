@@ -1700,7 +1700,7 @@ before fix 3)</td>
 <td align="left">5</td>
 <td align="left">Invalid package alias <code>aline-package</code></td>
 <td align="left">NOTE, Rd metadata</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
@@ -1853,6 +1853,26 @@ malformed <code>doi://dx.doi.org/...</code> (now
 URLs, only the expected “New submission / Package was archived on CRAN”.
 <code>citation(&quot;alineR&quot;)</code> and the package help page show working
 DOIs.</p>
+</div>
+<div id="fix-5-invalid-package-alias-2026-11-14" class="section level3">
+<h3>Fix 5: invalid package alias (2026-11-14)</h3>
+<p><strong>Problem.</strong> <code>R CMD check</code> NOTE (Rd
+metadata): “Invalid package aliases in Rd file ‘aline-package.Rd’:
+‘aline-package’”. The package overview page must have the alias
+<code>&lt;package&gt;-package</code>,
+i.e. <code>alineR-package</code>.</p>
+<p><strong>Fix.</strong> In <code>man/aline-package.Rd</code>:</p>
+<pre class="text"><code>\name{alineR-package}
+\docType{package}
+\alias{alineR-package}
+\alias{alineR}</code></pre>
+<p>The extra <code>alineR</code> alias makes <code>?alineR</code> open
+the overview page.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38">c26891b</a></p>
+<p><strong>Verified.</strong> <code>R CMD check</code>:
+<code>0 WARNINGs, 2 NOTEs</code> (was 3); “Rd metadata” OK.
+<code>?&quot;alineR-package&quot;</code> and <code>?alineR</code> both
+resolve.</p>
 </div>
 </div>
 

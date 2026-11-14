@@ -22,6 +22,6 @@ Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Me
 | 2 | Examples write CSV files to the working directory | Caused archival | Fixed | [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d) |
 | 3 | Version equals archived 1.1.4 | Blocks resubmission | Fixed | [5f016bf](https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5) |
 | 4 | Two moved URLs | NOTE | Fixed | [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b) |
-| 5 | Invalid package alias `aline-package` | NOTE | Open |  |
+| 5 | Invalid package alias `aline-package` | NOTE | Fixed | [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38) |
 | 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Open |  |
 | 7 | Buffer overflow on long words | Wrong results / crash | Open |  |
