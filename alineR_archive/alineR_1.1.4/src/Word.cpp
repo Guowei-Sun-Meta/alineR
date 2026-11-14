@@ -131,7 +131,7 @@ void Word::applyRedundancyRules()
                  if ( FCon[i][FHigh] == hgh ) FCon[i][FStop] = hvl;
             else if ( FCon[i][FHigh] == mid ) FCon[i][FStop] = mvl;
             else if ( FCon[i][FHigh] == low ) FCon[i][FStop] = lvl;
-            else ALINE_ASSERT( false );
+            else assert( false );
         }
 
         if ( !vowel(FCon[i]) )		// harmless
@@ -145,18 +145,18 @@ void Word::applyRedundancyRules()
 Word::Word( const char *w )
 {
     outlen = strlen( w );
-    ALINE_ASSERT( outlen > 0 && outlen < ELEN );
-    ALINE_ASSERT( w[0] >= BASE_LOW );
+    assert( outlen > 0 && outlen < ELEN );
+    assert( w[0] >= BASE_LOW );
     strcpy( out, w );
     fconvert();
 }
 
 // Display external representation sequence corresponding to
 // an individual phoneme.
-int Word::flush( short wi, char *aback, int abackcount )
+int Word::flush( short wi, char aback[50], int abackcount )
 //void Word::flush( short wi )
 {
-    ALINE_ASSERT( wi >= 0 && wi < len );
+    assert( wi >= 0 && wi < len );
     short o1 = ind[wi];               // pointers to w.out
     short o2 = ind[wi+1];
     for ( int t = 0; t < TAB; t++ )
@@ -222,7 +222,7 @@ void Word::fconvert()
     }
     ind[j+1] = outlen;
     len = j+1;
-    ALINE_ASSERT( j+1 < PLEN );
+    assert( j+1 < PLEN );
 }
 
 // modifies feature matrix
@@ -254,7 +254,7 @@ void Word::modify( FP p, char c )
             break;
         default:
            // cout << "I don't know " << c << endl;
-            ALINE_ASSERT( false );
+            assert( false );
     }
 }
 

@@ -1,6 +1,6 @@
 # this function is creating candidate alignments for the users to rank and prepare a test set for our algorithm
 
-generate.training<-function(raw.data,search.size=1000,table=FALSE,file.out="candidate_alignments.csv"){
+generate.training<-function(raw.data,search.size=1000,table=TRUE,file.out="candidate_alignments.csv"){
 
   
   #raw.data should be a vector of word pairs

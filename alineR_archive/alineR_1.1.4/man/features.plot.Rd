@@ -45,3 +45,5 @@ M2<-optimize.features(set=M1,ranking=c(1,1,1),
 features.plot(M2)
 }
 
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

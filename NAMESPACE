@@ -1,6 +1,0 @@
-export("aline","raw.alignment","encode.ALINE","decode.ALINE","map","features.plot","ALINE.segments","show.map")
-export("generate.training","optimize.features","ALINE.map","optimization.GA")
-useDynLib(alineR, .registration = TRUE, .fixes = "C_")
-importFrom(graphics,par,hist,abline,legend,plot)
-importFrom(utils,write.csv)
-importFrom(stats,median)

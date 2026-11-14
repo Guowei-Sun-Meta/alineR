@@ -51,7 +51,7 @@ public:
     void showCode()     { printf( "%s ", out ); }
 
     //void flush( short i );     // flushes out code corresponding to segment i
-    int flush( short i, char *aback, int abackcount ); 
+    int flush( short i, char aback[50], int abackcount ); 
     void showAll();            // display all fields
 
     static void applyRedundancyRules(); // operates on FCon
