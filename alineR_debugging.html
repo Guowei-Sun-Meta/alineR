@@ -1731,7 +1731,7 @@ overflow, silent garbage</td>
 <td align="left">Native routines never registered: init function is
 named <code>R_init_markovchain</code> (copy-paste)</td>
 <td align="left">Correctness check</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="even">
 <td align="left">10</td>
@@ -2020,6 +2020,35 @@ characters inside a word.</p>
 and all examples. Paper reference outputs and the full differential test
 (1,500 pairs, all exported functions) identical to fix 7.
 <code>R CMD check</code>: <code>1 NOTE</code> (unchanged).</p>
+</div>
+<div id="fix-9-native-routine-never-registered-2026-11-14" class="section level3">
+<h3>Fix 9: native routine never registered (2026-11-14)</h3>
+<p><strong>Problem.</strong> <code>src/registerDynamicsSymbol.c</code>
+defined <code>R_init_markovchain</code>, a name copied from another
+package. R calls <code>R_init_&lt;package&gt;</code> on load, i.e.
+<code>R_init_alineR</code>, so nothing was registered
+(<code>getDLLRegisteredRoutines(&quot;alineR&quot;)</code> was empty) and
+<code>.Call(&quot;exchange&quot;, ...)</code> worked only through dynamic symbol
+lookup. Not flagged by <code>R CMD check</code>, but contrary to
+“Writing R Extensions” and fragile (any other loaded library exporting
+<code>exchange</code> could be found).</p>
+<p><strong>Fix.</strong></p>
+<pre class="c"><code>static const R_CallMethodDef CallEntries[] = {
+    {&quot;exchange&quot;, (DL_FUNC) &amp;exchange, 3},
+    {NULL, NULL, 0}
+};
+void R_init_alineR(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}</code></pre>
+<p><code>NAMESPACE</code>:
+<code>useDynLib(&quot;alineR&quot;, .registration = TRUE, .fixes = &quot;C_&quot;)</code>;
+<code>R/raw.alignment.R</code>: <code>.Call(C_exchange, ...)</code>.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/5a93f72b09e7a84f7a51abb7f6bb38a743f5905a">5a93f72</a></p>
+<p><strong>Verified.</strong> <code>exchange</code> registered with 3
+parameters; dynamic lookup off. Paper reference outputs identical.
+<code>R CMD check</code>: <code>1 NOTE</code>; “foreign function calls”
+and “compiled code” OK.</p>
 </div>
 </div>
 

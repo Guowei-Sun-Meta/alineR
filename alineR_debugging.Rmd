@@ -55,7 +55,7 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Fixed (2026-11-14) |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
 | 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Fixed (2026-11-14) |
-| 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Open |
+| 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Fixed (2026-11-14) |
 | 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Open |
 | 11 | `ALINE.segments()` recomputes segments with hard-coded default weights, so it returns `"Error"` for any non-default weights | Correctness check | Open |
 | 12 | Skip penalty `sk` is added to the score (a bonus) on the internal x100 scale; Kondrak's original subtracts 10 points | Correctness check | Deferred: fixing changes published results |
@@ -271,3 +271,34 @@ unknown characters inside a word.
 **Verified.** UBSan/ASan clean on all malformed inputs and all examples.
 Paper reference outputs and the full differential test (1,500 pairs, all
 exported functions) identical to fix 7. `R CMD check`: `1 NOTE` (unchanged).
+
+### Fix 9: native routine never registered (2026-11-14)
+
+**Problem.** `src/registerDynamicsSymbol.c` defined `R_init_markovchain`, a
+name copied from another package. R calls `R_init_<package>` on load, i.e.
+`R_init_alineR`, so nothing was registered (`getDLLRegisteredRoutines("alineR")`
+was empty) and `.Call("exchange", ...)` worked only through dynamic symbol
+lookup. Not flagged by `R CMD check`, but contrary to "Writing R Extensions"
+and fragile (any other loaded library exporting `exchange` could be found).
+
+**Fix.**
+
+```c
+static const R_CallMethodDef CallEntries[] = {
+    {"exchange", (DL_FUNC) &exchange, 3},
+    {NULL, NULL, 0}
+};
+void R_init_alineR(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+}
+```
+
+`NAMESPACE`: `useDynLib("alineR", .registration = TRUE, .fixes = "C_")`;
+`R/raw.alignment.R`: `.Call(C_exchange, ...)`.
+
+**GitHub:** [5a93f72](https://github.com/Guowei-Sun-Meta/research/commit/5a93f72b09e7a84f7a51abb7f6bb38a743f5905a)
+
+**Verified.** `exchange` registered with 3 parameters; dynamic lookup off.
+Paper reference outputs identical. `R CMD check`: `1 NOTE`; "foreign function
+calls" and "compiled code" OK.
