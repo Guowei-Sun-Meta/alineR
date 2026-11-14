@@ -1649,7 +1649,7 @@ aline(c(&quot;ũmlatʃ&quot;,&quot;dinnira&quot;), c(&quot;omlatʃ&quot;,&quot;d
 CRAN source in <code>alineR_archive/alineR_1.1.4/</code>). Each fix is
 checked with:</p>
 <pre class="text"><code>R CMD build alineR
-R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz</code></pre>
+R CMD check --as-cran --no-manual alineR_&lt;version&gt;.tar.gz   # 1.1.4 until fix 3, then 1.1.5</code></pre>
 <div id="issue-list" class="section level3">
 <h3>Issue list</h3>
 <table>
@@ -1686,20 +1686,21 @@ vector</td>
 <td align="left">3</td>
 <td align="left">Version 1.1.4 equals the archived version</td>
 <td align="left">WARNING, CRAN incoming feasibility</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
 <td align="left">Two URLs moved (301): Kondrak homepage, R Journal
 article</td>
-<td align="left">WARNING, CRAN incoming feasibility</td>
-<td align="left">Open</td>
+<td align="left">NOTE, CRAN incoming feasibility (part of the WARNING
+before fix 3)</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
 <td align="left">Invalid package alias <code>aline-package</code></td>
 <td align="left">NOTE, Rd metadata</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
@@ -1725,39 +1726,6 @@ C++ unchecked: out-of-bounds write (<code>phon[-1]</code>), integer
 overflow, silent garbage</td>
 <td align="left">Correctness check (UBSan)</td>
 <td align="left">Fixed (2026-11-14)</td>
-</tr>
-<tr class="odd">
-<td align="left">9</td>
-<td align="left">Native routines never registered: init function is
-named <code>R_init_markovchain</code> (copy-paste)</td>
-<td align="left">Correctness check</td>
-<td align="left">Deferred to 1.2.0 (fix in 5a93f72, reverted from
-1.1.5)</td>
-</tr>
-<tr class="even">
-<td align="left">10</td>
-<td align="left"><code>decode.ALINE()</code> drops only the last invalid
-character, so the decoded alignment shows wrong letters</td>
-<td align="left">Correctness check</td>
-<td align="left">Deferred to 1.2.0 (fix in d238edd, reverted from
-1.1.5)</td>
-</tr>
-<tr class="odd">
-<td align="left">11</td>
-<td align="left"><code>ALINE.segments()</code> recomputes segments with
-hard-coded default weights, so it returns <code>&quot;Error&quot;</code> for any
-non-default weights</td>
-<td align="left">Correctness check</td>
-<td align="left">Deferred to 1.2.0</td>
-</tr>
-<tr class="even">
-<td align="left">12</td>
-<td align="left">Skip penalty <code>sk</code> is added to the score (a
-bonus) on the internal x100 scale; Kondrak’s original subtracts 10
-points</td>
-<td align="left">Correctness check</td>
-<td align="left">Deferred to 1.2.0: fixing changes published
-results</td>
 </tr>
 </tbody>
 </table>
@@ -1835,8 +1803,85 @@ call writes no files; <code>table = TRUE</code> still writes
 <code>file.out</code>. Note: users who relied on the old default must
 now pass <code>table = TRUE</code>.</p>
 </div>
-<div id="fix-6-template-keywords-in-rd-files-2026-11-14" class="section level3">
-<h3>Fix 6: template keywords in Rd files (2026-11-14)</h3>
+<div id="fix-3-version-equals-the-archived-version-2026-11-14" class="section level3">
+<h3>Fix 3: version equals the archived version (2026-11-14)</h3>
+<p><strong>Problem.</strong> The CRAN incoming check gave a WARNING:
+“Insufficient package version (submitted: 1.1.4, existing: 1.1.4)” and
+“The Date field is over a month old”. CRAN rejects a resubmission with
+an unchanged version.</p>
+<p><strong>Fix.</strong> Version 1.1.5 (patch release). In
+<code>DESCRIPTION</code>:</p>
+<pre class="text"><code>Version: 1.1.5
+Date: 2026-11-14</code></pre>
+<p>and removed the fields CRAN and <code>R CMD build</code> add
+themselves, which were stale from 2017 (<code>Packaged</code>,
+<code>Repository</code>, <code>Date/Publication</code>). Also:</p>
+<ul>
+<li>Removed the CRAN-generated <code>MD5</code> file: it no longer
+matched the sources after fixes 1-2 (<code>tools::checkMD5sums()</code>
+was FALSE) and is regenerated on build.</li>
+<li>Updated the version/date in <code>man/aline-package.Rd</code> and
+the version in <code>inst/CITATION</code>.</li>
+</ul>
+<p>The earlier, discarded fix attempt’s git tag
+<code>alineR-1.1.5</code> and branch <code>alineR-cran-1.1.5</code> were
+deleted so the name refers only to this release.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5">5f016bf</a></p>
+<p><strong>Verified.</strong> <code>R CMD check</code>:
+<code>0 WARNINGs, 3 NOTEs</code> (was <code>1 WARNING, 2 NOTEs</code>).
+The incoming-feasibility check is now a NOTE: the expected “New
+submission / Package was archived on CRAN” text, plus the moved URLs
+(issue 4).</p>
+</div>
+<div id="fix-4-moved-urls-2026-11-14" class="section level3">
+<h3>Fix 4: moved URLs (2026-11-14)</h3>
+<p><strong>Problem.</strong> The CRAN incoming check listed two URLs
+answering <code>301 Moved Permanently</code>: the R Journal article
+(<code>https://journal.r-project.org/archive/2017/RJ-2017-005/index.html</code>,
+in <code>DESCRIPTION</code>, <code>man/aline-package.Rd</code>,
+<code>inst/CITATION</code>) and Kondrak’s homepage
+(<code>http://webdocs.cs.ualberta.ca/~kondrak/</code>, in
+<code>man/aline-package.Rd</code>).</p>
+<p><strong>Fix.</strong></p>
+<ul>
+<li>R Journal article: replaced by its DOI,
+<code>10.32614/RJ-2017-005</code> (<code>&lt;doi:...&gt;</code> in
+<code>DESCRIPTION</code>, <code>\doi{}</code> in Rd, <code>doi =</code>
+in <code>CITATION</code>). CRAN prefers DOIs, and DOIs are not flagged
+when the publisher moves pages.</li>
+<li>Kondrak’s homepage now answers <code>410 Gone</code> with no
+successor, so the link is dropped; the acknowledgement stays.</li>
+<li>Same category, not flagged by CRAN: the 2008 reference had a
+malformed <code>doi://dx.doi.org/...</code> (now
+<code>\doi{10.1080/09296170802326681}</code>), and the
+<code>DESCRIPTION</code> text was missing a closing parenthesis.</li>
+</ul>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b">36d02b5</a></p>
+<p><strong>Verified.</strong> <code>R CMD check</code>:
+<code>0 WARNINGs, 3 NOTEs</code>; the incoming NOTE no longer lists
+URLs, only the expected “New submission / Package was archived on CRAN”.
+<code>citation(&quot;alineR&quot;)</code> and the package help page show working
+DOIs.</p>
+</div>
+<div id="fix-5-invalid-package-alias-2026-11-14" class="section level3">
+<h3>Fix 5: invalid package alias (2026-11-14)</h3>
+<p><strong>Problem.</strong> <code>R CMD check</code> NOTE (Rd
+metadata): “Invalid package aliases in Rd file ‘aline-package.Rd’:
+‘aline-package’”. The package overview page must have the alias
+<code>&lt;package&gt;-package</code>,
+i.e. <code>alineR-package</code>.</p>
+<p><strong>Fix.</strong> In <code>man/aline-package.Rd</code>:</p>
+<pre class="text"><code>\name{alineR-package}
+\docType{package}
+\alias{alineR-package}
+\alias{alineR}</code></pre>
+<p>The extra <code>alineR</code> alias makes <code>?alineR</code> open
+the overview page.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38">c26891b</a></p>
+<p><strong>Verified.</strong> <code>R CMD check</code>:
+<code>0 WARNINGs, 2 NOTEs</code> (was 3); “Rd metadata” OK.
+<code>?&quot;alineR-package&quot;</code> and <code>?alineR</code> both resolve.
+### Fix 6: template keywords in Rd files (2026-11-14)</p>
 <p><strong>Problem.</strong> <code>R CMD check</code> NOTE (Rd
 contents): “Auto-generated content requiring editing” in
 <code>man/features.plot.Rd</code> and
@@ -1952,15 +1997,6 @@ through. UBSan: <code>index -1 out of bounds</code>
 modifier, e.g. <code>aline(&quot;ÈÈ&quot;, &quot;ta&quot;)</code> where all characters are
 unknown; <code>signed integer overflow</code>
 (<code>Word.cpp:292</code>) for <code>NA</code> weights.</p>
-<p><strong>Review of R functions</strong> (each confirmed by running
-it): issues 9-12.</p>
-<pre class="text"><code>decode.ALINE(&quot;tÈaÈ&quot;, &lt;alignment of &quot;ta&quot;&gt;)        &quot;|  t   È   |&quot;    should be t a
-ALINE.segments(raw.alignment(c(&quot;pat&quot;,&quot;tak&quot;), Place = 90, Voice = 80),
-               Place = 90, Voice = 80)          &quot;Error&quot;
-raw.alignment(c(&quot;watu&quot;,&quot;dat&quot;), sk = s)          sk = 0: 50, 10: 50, 100: 52, 1000: 75</code></pre>
-<p>Issue 12 is real but deliberately not fixed in 1.1.5: correcting the
-skip penalty changes every published ALINE distance, including those in
-the R Journal paper.</p>
 </div>
 <div id="fix-8-invalid-input-reached-the-c-unchecked-2026-11-14" class="section level3">
 <h3>Fix 8: invalid input reached the C++ unchecked (2026-11-14)</h3>
@@ -2023,85 +2059,6 @@ characters inside a word.</p>
 and all examples. Paper reference outputs and the full differential test
 (1,500 pairs, all exported functions) identical to fix 7.
 <code>R CMD check</code>: <code>1 NOTE</code> (unchanged).</p>
-</div>
-<div id="fix-9-native-routine-never-registered-2026-11-14" class="section level3">
-<h3>Fix 9: native routine never registered (2026-11-14)</h3>
-<p><strong>Moved to 1.2.0.</strong> Scope decision: 1.1.5 contains fixes
-1-8 only. This fix was reverted from 1.1.5 in <a href="https://github.com/Guowei-Sun-Meta/research/commit/2a1a14b70c6e479fb3529640a8d156b8181837b3">2a1a14b</a>
-and will be re-applied in 1.2.0.</p>
-<p><strong>Problem.</strong> <code>src/registerDynamicsSymbol.c</code>
-defined <code>R_init_markovchain</code>, a name copied from another
-package. R calls <code>R_init_&lt;package&gt;</code> on load, i.e.
-<code>R_init_alineR</code>, so nothing was registered
-(<code>getDLLRegisteredRoutines(&quot;alineR&quot;)</code> was empty) and
-<code>.Call(&quot;exchange&quot;, ...)</code> worked only through dynamic symbol
-lookup. Not flagged by <code>R CMD check</code>, but contrary to
-“Writing R Extensions” and fragile (any other loaded library exporting
-<code>exchange</code> could be found).</p>
-<p><strong>Fix.</strong></p>
-<pre class="c"><code>static const R_CallMethodDef CallEntries[] = {
-    {&quot;exchange&quot;, (DL_FUNC) &amp;exchange, 3},
-    {NULL, NULL, 0}
-};
-void R_init_alineR(DllInfo *dll) {
-  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
-}</code></pre>
-<p><code>NAMESPACE</code>:
-<code>useDynLib(&quot;alineR&quot;, .registration = TRUE, .fixes = &quot;C_&quot;)</code>;
-<code>R/raw.alignment.R</code>: <code>.Call(C_exchange, ...)</code>.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/5a93f72b09e7a84f7a51abb7f6bb38a743f5905a">5a93f72</a></p>
-<p><strong>Verified.</strong> <code>exchange</code> registered with 3
-parameters; dynamic lookup off. Paper reference outputs identical.
-<code>R CMD check</code>: <code>1 NOTE</code>; “foreign function calls”
-and “compiled code” OK.</p>
-</div>
-<div id="fix-10-decode.aline-dropped-only-the-last-invalid-character-2026-11-14" class="section level3">
-<h3>Fix 10: <code>decode.ALINE()</code> dropped only the last invalid
-character (2026-11-14)</h3>
-<p><strong>Moved to 1.2.0.</strong> Scope decision: 1.1.5 contains fixes
-1-8 only. This fix was reverted from 1.1.5 in <a href="https://github.com/Guowei-Sun-Meta/research/commit/354e7de42d563c37f4ce901c74a43a841a602b29">354e7de</a>
-and will be re-applied in 1.2.0.</p>
-<p><strong>Problem.</strong> <code>decode.ALINE()</code> maps an encoded
-alignment back to the IPA word, first dropping characters that have no
-mapping. The loop did <code>t &lt;- splitx[[1]][-j]</code>, restarting
-from the full word each time, so only the last invalid character was
-dropped and the remaining letters were shifted:</p>
-<pre class="text"><code>word     1.1.4 decoded alignment     fixed
-tÈaÈ     |  t   È   |                |  t   a   |
-ÈtaÈ     |  È   t   |                |  t   a   |
-tÈÈa     |  t   È   |                |  t   a   |</code></pre>
-<p>This also affects <code>aline(..., alignment = TRUE)</code>, which
-uses <code>decode.ALINE()</code>.</p>
-<p><strong>Fix.</strong> Drop all characters without a mapping in one
-step:</p>
-<pre class="r"><code>valid &lt;- splitx[[1]] %in% intToUtf8(map$U.Val, multiple = TRUE)
-splitx[[1]] &lt;- splitx[[1]][valid]</code></pre>
-<p>Same function: <code>for (i in 1:num-1)</code> iterated over
-<code>0:(num-1)</code>; index 0 only worked because
-<code>logical(0) &amp;&amp; FALSE</code> is <code>FALSE</code>. Now
-<code>seq_len(num - 1)</code>.</p>
-<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/d238edd86e5447d03969d6d4233db5e0ede4314d">d238edd</a></p>
-<p><strong>Verified.</strong> The cases above decode correctly. Paper
-reference outputs and the differential test (words without invalid
-characters) identical to fix 9. <code>R CMD check</code>:
-<code>1 NOTE</code>.</p>
-</div>
-<div id="scope-of-1.1.5-2026-11-14" class="section level3">
-<h3>Scope of 1.1.5 (2026-11-14)</h3>
-<p>1.1.5 contains fixes 1-8: the two archival causes (1, 2), what blocks
-a resubmission (3-6), and the memory-safety bugs (7, 8). Issues 9-12
-move to 1.2.0. Fixes 9 and 10 were reverted, so the package is identical
-to the state after fix 8.</p>
-<p><strong>Issue 11, notes for 1.2.0.</strong> Passing the weights
-through (the obvious fix) is not enough: <code>ALINE.segments()</code>
-still returns <code>&quot;Error&quot;</code> for non-default weights, in 1.1.4 and
-with the change. It rescores each aligned pair as an independent
-two-segment alignment, which does not reproduce the pair’s contribution
-inside the full alignment once weights change. It also errors on
-alignments without two <code>|</code> borders
-(<code>(ind[1] + 1):(ind[2] - 1) : NA/NaN argument</code>). The segment
-scores should come from the C++ alignment itself.</p>
 </div>
 <div id="correctness-check-part-2-final-1.1.5-2026-11-14" class="section level3">
 <h3>Correctness check, part 2: final 1.1.5 (2026-11-14)</h3>

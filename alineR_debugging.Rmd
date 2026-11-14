@@ -38,10 +38,8 @@ Working copy: `alineR/alineR/` (copied from the untouched CRAN source in
 
 ```text
 R CMD build alineR
-R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
+R CMD check --as-cran --no-manual alineR_<version>.tar.gz   # 1.1.4 until fix 3, then 1.1.5
 ```
-
-
 
 ### Issue list
 
@@ -49,16 +47,12 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 |:--|:--------|:-------|:-------|
 | 1 | C++ reads 13 feature weights from a 12-element vector | CRAN valgrind (cause of archival) | Fixed (2026-11-14) |
 | 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Fixed (2026-11-14) |
-| 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Open |
-| 4 | Two URLs moved (301): Kondrak homepage, R Journal article | WARNING, CRAN incoming feasibility | Open |
-| 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
+| 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Fixed (2026-11-14) |
+| 4 | Two URLs moved (301): Kondrak homepage, R Journal article | NOTE, CRAN incoming feasibility (part of the WARNING before fix 3) | Fixed (2026-11-14) |
+| 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Fixed (2026-11-14) |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Fixed (2026-11-14) |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
 | 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Fixed (2026-11-14) |
-| 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Deferred to 1.2.0 (fix in 5a93f72, reverted from 1.1.5) |
-| 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Deferred to 1.2.0 (fix in d238edd, reverted from 1.1.5) |
-| 11 | `ALINE.segments()` recomputes segments with hard-coded default weights, so it returns `"Error"` for any non-default weights | Correctness check | Deferred to 1.2.0 |
-| 12 | Skip penalty `sk` is added to the score (a bonus) on the internal x100 scale; Kondrak's original subtracts 10 points | Correctness check | Deferred to 1.2.0: fixing changes published results |
 
 ### Step 0: baseline (2026-11-14)
 
@@ -138,6 +132,81 @@ the check directory. A default `generate.training()` call writes no files;
 `table = TRUE` still writes `file.out`. Note: users who relied on the old
 default must now pass `table = TRUE`.
 
+### Fix 3: version equals the archived version (2026-11-14)
+
+**Problem.** The CRAN incoming check gave a WARNING: "Insufficient package
+version (submitted: 1.1.4, existing: 1.1.4)" and "The Date field is over a
+month old". CRAN rejects a resubmission with an unchanged version.
+
+**Fix.** Version 1.1.5 (patch release). In `DESCRIPTION`:
+
+```text
+Version: 1.1.5
+Date: 2026-11-14
+```
+
+and removed the fields CRAN and `R CMD build` add themselves, which were stale
+from 2017 (`Packaged`, `Repository`, `Date/Publication`). Also:
+
+- Removed the CRAN-generated `MD5` file: it no longer matched the sources after
+  fixes 1-2 (`tools::checkMD5sums()` was FALSE) and is regenerated on build.
+- Updated the version/date in `man/aline-package.Rd` and the version in `inst/CITATION`.
+
+The earlier, discarded fix attempt's git tag `alineR-1.1.5` and branch
+`alineR-cran-1.1.5` were deleted so the name refers only to this release.
+
+**GitHub:** [5f016bf](https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5)
+
+**Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs` (was `1 WARNING, 2 NOTEs`).
+The incoming-feasibility check is now a NOTE: the expected "New submission /
+Package was archived on CRAN" text, plus the moved URLs (issue 4).
+
+### Fix 4: moved URLs (2026-11-14)
+
+**Problem.** The CRAN incoming check listed two URLs answering
+`301 Moved Permanently`: the R Journal article
+(`https://journal.r-project.org/archive/2017/RJ-2017-005/index.html`, in
+`DESCRIPTION`, `man/aline-package.Rd`, `inst/CITATION`) and Kondrak's homepage
+(`http://webdocs.cs.ualberta.ca/~kondrak/`, in `man/aline-package.Rd`).
+
+**Fix.**
+
+- R Journal article: replaced by its DOI, `10.32614/RJ-2017-005`
+  (`<doi:...>` in `DESCRIPTION`, `\doi{}` in Rd, `doi =` in `CITATION`).
+  CRAN prefers DOIs, and DOIs are not flagged when the publisher moves pages.
+- Kondrak's homepage now answers `410 Gone` with no successor, so the link is
+  dropped; the acknowledgement stays.
+- Same category, not flagged by CRAN: the 2008 reference had a malformed
+  `doi://dx.doi.org/...` (now `\doi{10.1080/09296170802326681}`), and the
+  `DESCRIPTION` text was missing a closing parenthesis.
+
+**GitHub:** [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b)
+
+**Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs`; the incoming NOTE no
+longer lists URLs, only the expected "New submission / Package was archived on
+CRAN". `citation("alineR")` and the package help page show working DOIs.
+
+### Fix 5: invalid package alias (2026-11-14)
+
+**Problem.** `R CMD check` NOTE (Rd metadata): "Invalid package aliases in Rd
+file 'aline-package.Rd': 'aline-package'". The package overview page must have
+the alias `<package>-package`, i.e. `alineR-package`.
+
+**Fix.** In `man/aline-package.Rd`:
+
+```text
+\name{alineR-package}
+\docType{package}
+\alias{alineR-package}
+\alias{alineR}
+```
+
+The extra `alineR` alias makes `?alineR` open the overview page.
+
+**GitHub:** [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38)
+
+**Verified.** `R CMD check`: `0 WARNINGs, 2 NOTEs` (was 3); "Rd metadata" OK.
+`?"alineR-package"` and `?alineR` both resolve.
 ### Fix 6: template keywords in Rd files (2026-11-14)
 
 **Problem.** `R CMD check` NOTE (Rd contents): "Auto-generated content
@@ -224,19 +293,6 @@ for an empty word or one starting with a modifier, e.g. `aline("ÈÈ", "ta")`
 where all characters are unknown; `signed integer overflow` (`Word.cpp:292`)
 for `NA` weights.
 
-**Review of R functions** (each confirmed by running it): issues 9-12.
-
-```text
-decode.ALINE("tÈaÈ", <alignment of "ta">)        "|  t   È   |"    should be t a
-ALINE.segments(raw.alignment(c("pat","tak"), Place = 90, Voice = 80),
-               Place = 90, Voice = 80)          "Error"
-raw.alignment(c("watu","dat"), sk = s)          sk = 0: 50, 10: 50, 100: 52, 1000: 75
-```
-
-Issue 12 is real but deliberately not fixed in 1.1.5: correcting the skip
-penalty changes every published ALINE distance, including those in the R
-Journal paper.
-
 ### Fix 8: invalid input reached the C++ unchecked (2026-11-14)
 
 **Problem.** The C++ guards its input with `assert()`, but R compiles packages
@@ -271,88 +327,6 @@ unknown characters inside a word.
 **Verified.** UBSan/ASan clean on all malformed inputs and all examples.
 Paper reference outputs and the full differential test (1,500 pairs, all
 exported functions) identical to fix 7. `R CMD check`: `1 NOTE` (unchanged).
-
-### Fix 9: native routine never registered (2026-11-14)
-
-**Moved to 1.2.0.** Scope decision: 1.1.5 contains fixes 1-8 only. This fix was reverted from 1.1.5 in [2a1a14b](https://github.com/Guowei-Sun-Meta/research/commit/2a1a14b70c6e479fb3529640a8d156b8181837b3) and will be re-applied in 1.2.0.
-
-**Problem.** `src/registerDynamicsSymbol.c` defined `R_init_markovchain`, a
-name copied from another package. R calls `R_init_<package>` on load, i.e.
-`R_init_alineR`, so nothing was registered (`getDLLRegisteredRoutines("alineR")`
-was empty) and `.Call("exchange", ...)` worked only through dynamic symbol
-lookup. Not flagged by `R CMD check`, but contrary to "Writing R Extensions"
-and fragile (any other loaded library exporting `exchange` could be found).
-
-**Fix.**
-
-```c
-static const R_CallMethodDef CallEntries[] = {
-    {"exchange", (DL_FUNC) &exchange, 3},
-    {NULL, NULL, 0}
-};
-void R_init_alineR(DllInfo *dll) {
-  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
-}
-```
-
-`NAMESPACE`: `useDynLib("alineR", .registration = TRUE, .fixes = "C_")`;
-`R/raw.alignment.R`: `.Call(C_exchange, ...)`.
-
-**GitHub:** [5a93f72](https://github.com/Guowei-Sun-Meta/research/commit/5a93f72b09e7a84f7a51abb7f6bb38a743f5905a)
-
-**Verified.** `exchange` registered with 3 parameters; dynamic lookup off.
-Paper reference outputs identical. `R CMD check`: `1 NOTE`; "foreign function
-calls" and "compiled code" OK.
-
-### Fix 10: `decode.ALINE()` dropped only the last invalid character (2026-11-14)
-
-**Moved to 1.2.0.** Scope decision: 1.1.5 contains fixes 1-8 only. This fix was reverted from 1.1.5 in [354e7de](https://github.com/Guowei-Sun-Meta/research/commit/354e7de42d563c37f4ce901c74a43a841a602b29) and will be re-applied in 1.2.0.
-
-**Problem.** `decode.ALINE()` maps an encoded alignment back to the IPA word,
-first dropping characters that have no mapping. The loop did
-`t <- splitx[[1]][-j]`, restarting from the full word each time, so only the
-last invalid character was dropped and the remaining letters were shifted:
-
-```text
-word     1.1.4 decoded alignment     fixed
-tÈaÈ     |  t   È   |                |  t   a   |
-ÈtaÈ     |  È   t   |                |  t   a   |
-tÈÈa     |  t   È   |                |  t   a   |
-```
-
-This also affects `aline(..., alignment = TRUE)`, which uses `decode.ALINE()`.
-
-**Fix.** Drop all characters without a mapping in one step:
-
-```r
-valid <- splitx[[1]] %in% intToUtf8(map$U.Val, multiple = TRUE)
-splitx[[1]] <- splitx[[1]][valid]
-```
-
-Same function: `for (i in 1:num-1)` iterated over `0:(num-1)`; index 0 only
-worked because `logical(0) && FALSE` is `FALSE`. Now `seq_len(num - 1)`.
-
-**GitHub:** [d238edd](https://github.com/Guowei-Sun-Meta/research/commit/d238edd86e5447d03969d6d4233db5e0ede4314d)
-
-**Verified.** The cases above decode correctly. Paper reference outputs and the
-differential test (words without invalid characters) identical to fix 9.
-`R CMD check`: `1 NOTE`.
-
-### Scope of 1.1.5 (2026-11-14)
-
-1.1.5 contains fixes 1-8: the two archival causes (1, 2), what blocks a
-resubmission (3-6), and the memory-safety bugs (7, 8). Issues 9-12 move to
-1.2.0. Fixes 9 and 10 were reverted, so the package is identical to the state
-after fix 8.
-
-**Issue 11, notes for 1.2.0.** Passing the weights through (the obvious fix)
-is not enough: `ALINE.segments()` still returns `"Error"` for non-default
-weights, in 1.1.4 and with the change. It rescores each aligned pair as an
-independent two-segment alignment, which does not reproduce the pair's
-contribution inside the full alignment once weights change. It also errors on
-alignments without two `|` borders (`(ind[1] + 1):(ind[2] - 1) : NA/NaN
-argument`). The segment scores should come from the C++ alignment itself.
 
 ### Correctness check, part 2: final 1.1.5 (2026-11-14)
 
