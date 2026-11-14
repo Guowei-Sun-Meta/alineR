@@ -56,7 +56,7 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
 | 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Fixed (2026-11-14) |
 | 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Fixed (2026-11-14) |
-| 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Open |
+| 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Fixed (2026-11-14) |
 | 11 | `ALINE.segments()` recomputes segments with hard-coded default weights, so it returns `"Error"` for any non-default weights | Correctness check | Open |
 | 12 | Skip penalty `sk` is added to the score (a bonus) on the internal x100 scale; Kondrak's original subtracts 10 points | Correctness check | Deferred: fixing changes published results |
 
@@ -302,3 +302,35 @@ void R_init_alineR(DllInfo *dll) {
 **Verified.** `exchange` registered with 3 parameters; dynamic lookup off.
 Paper reference outputs identical. `R CMD check`: `1 NOTE`; "foreign function
 calls" and "compiled code" OK.
+
+### Fix 10: `decode.ALINE()` dropped only the last invalid character (2026-11-14)
+
+**Problem.** `decode.ALINE()` maps an encoded alignment back to the IPA word,
+first dropping characters that have no mapping. The loop did
+`t <- splitx[[1]][-j]`, restarting from the full word each time, so only the
+last invalid character was dropped and the remaining letters were shifted:
+
+```text
+word     1.1.4 decoded alignment     fixed
+tÈaÈ     |  t   È   |                |  t   a   |
+ÈtaÈ     |  È   t   |                |  t   a   |
+tÈÈa     |  t   È   |                |  t   a   |
+```
+
+This also affects `aline(..., alignment = TRUE)`, which uses `decode.ALINE()`.
+
+**Fix.** Drop all characters without a mapping in one step:
+
+```r
+valid <- splitx[[1]] %in% intToUtf8(map$U.Val, multiple = TRUE)
+splitx[[1]] <- splitx[[1]][valid]
+```
+
+Same function: `for (i in 1:num-1)` iterated over `0:(num-1)`; index 0 only
+worked because `logical(0) && FALSE` is `FALSE`. Now `seq_len(num - 1)`.
+
+**GitHub:** [d238edd](https://github.com/Guowei-Sun-Meta/research/commit/d238edd86e5447d03969d6d4233db5e0ede4314d)
+
+**Verified.** The cases above decode correctly. Paper reference outputs and the
+differential test (words without invalid characters) identical to fix 9.
+`R CMD check`: `1 NOTE`.

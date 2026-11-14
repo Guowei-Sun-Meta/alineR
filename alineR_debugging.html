@@ -1738,7 +1738,7 @@ named <code>R_init_markovchain</code> (copy-paste)</td>
 <td align="left"><code>decode.ALINE()</code> drops only the last invalid
 character, so the decoded alignment shows wrong letters</td>
 <td align="left">Correctness check</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="odd">
 <td align="left">11</td>
@@ -2049,6 +2049,34 @@ void R_init_alineR(DllInfo *dll) {
 parameters; dynamic lookup off. Paper reference outputs identical.
 <code>R CMD check</code>: <code>1 NOTE</code>; “foreign function calls”
 and “compiled code” OK.</p>
+</div>
+<div id="fix-10-decode.aline-dropped-only-the-last-invalid-character-2026-11-14" class="section level3">
+<h3>Fix 10: <code>decode.ALINE()</code> dropped only the last invalid
+character (2026-11-14)</h3>
+<p><strong>Problem.</strong> <code>decode.ALINE()</code> maps an encoded
+alignment back to the IPA word, first dropping characters that have no
+mapping. The loop did <code>t &lt;- splitx[[1]][-j]</code>, restarting
+from the full word each time, so only the last invalid character was
+dropped and the remaining letters were shifted:</p>
+<pre class="text"><code>word     1.1.4 decoded alignment     fixed
+tÈaÈ     |  t   È   |                |  t   a   |
+ÈtaÈ     |  È   t   |                |  t   a   |
+tÈÈa     |  t   È   |                |  t   a   |</code></pre>
+<p>This also affects <code>aline(..., alignment = TRUE)</code>, which
+uses <code>decode.ALINE()</code>.</p>
+<p><strong>Fix.</strong> Drop all characters without a mapping in one
+step:</p>
+<pre class="r"><code>valid &lt;- splitx[[1]] %in% intToUtf8(map$U.Val, multiple = TRUE)
+splitx[[1]] &lt;- splitx[[1]][valid]</code></pre>
+<p>Same function: <code>for (i in 1:num-1)</code> iterated over
+<code>0:(num-1)</code>; index 0 only worked because
+<code>logical(0) &amp;&amp; FALSE</code> is <code>FALSE</code>. Now
+<code>seq_len(num - 1)</code>.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/d238edd86e5447d03969d6d4233db5e0ede4314d">d238edd</a></p>
+<p><strong>Verified.</strong> The cases above decode correctly. Paper
+reference outputs and the differential test (words without invalid
+characters) identical to fix 9. <code>R CMD check</code>:
+<code>1 NOTE</code>.</p>
 </div>
 </div>
 
