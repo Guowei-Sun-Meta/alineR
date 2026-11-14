@@ -1,0 +1,26 @@
+# alineR CRAN fix
+
+Bringing [alineR](https://cran.r-project.org/package=alineR) back to CRAN (archived 2021-04-21).
+
+## Layout
+
+| Path | Contents |
+|:--|:--|
+| `alineR/` | Working copy of the package being fixed |
+| `alineR_archive/alineR_1.1.4/` | Original CRAN 1.1.4 source, untouched (reference) |
+| `alineR_debugging.Rmd` | Debugging log: details and verification of each fix |
+| `alineR_ An R Package ... .pdf` | The R Journal paper (2017) |
+
+## Issues
+
+Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10) (untouched 1.1.4), so its link shows only the package code change. Documentation is committed separately.
+
+| # | Issue | Why it matters | Status | Change |
+|:--|:--|:--|:--|:--|
+| 1 | C++ reads 13 weights from a 12-element vector | Caused archival (valgrind) | Fixed | [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) |
+| 2 | Examples write CSV files to the working directory | Caused archival | Open |  |
+| 3 | Version equals archived 1.1.4 | Blocks resubmission | Open |  |
+| 4 | Two moved URLs | WARNING | Open |  |
+| 5 | Invalid package alias `aline-package` | NOTE | Open |  |
+| 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Open |  |
+| 7 | Buffer overflow on long words | Wrong results / crash | Open |  |

@@ -11,22 +11,75 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Context
-This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages/alineR/index.html) back to CRAN. Last check from CRAN is [here](http://cran-archive.r-project.org/web/checks/2021/2021-04-21_check_results_alineR.html).
+This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages/alineR/index.html) back to CRAN. Last check from CRAN is [here](http://cran-archive.r-project.org/web/checks/2021/2021-04-21_check_results_alineR.html). We used Claude Opus 5.5 for debugging and fixing, with manual validation of reproducibility and CRAN package checks.
 
 
 ## alineR Debugging Log
 
+Working copy: `alineR/alineR/` (copied from the untouched CRAN source in
+`alineR_archive/alineR_1.1.4/`). Each fix is checked with:
 
-```{r cars}
-summary(cars)
+```text
+R CMD build alineR
+R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 ```
 
-## Including Plots
+### Issue list
 
-You can also embed plots, for example:
+| # | Problem | Source | Status |
+|:--|:--------|:-------|:-------|
+| 1 | C++ reads 13 feature weights from a 12-element vector | CRAN valgrind (cause of archival) | Fixed (2026-11-14) |
+| 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Open |
+| 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Open |
+| 4 | Two URLs moved (301): Kondrak homepage, R Journal article | WARNING, CRAN incoming feasibility | Open |
+| 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
+| 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Open |
+| 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Open |
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+### Step 0: baseline (2026-11-14)
+
+Unmodified 1.1.4 on R 4.6.2, macOS: `Status: 1 WARNING, 3 NOTEs` (issues 2-6
+above). Issue 1 does not show in a normal check; CRAN found it with valgrind.
+
+Reference outputs (the worked examples in Downey, Sun & Norquest 2017), used
+to confirm that fixes do not change results:
+
+```text
+aline("kərampu", "ləməntuŋ")                                      0.4864198
+aline(c("batu","kərampu"), c("batʊ","ləməntuŋ"))                  0.0000000 0.4864198
+aline("watu", "dat", sim = TRUE)                                  50
+ALINE.segments(raw.alignment(c("watu","dat")))                    0 0 15 35
+aline(c("batu","kərampu"), c("batʊ","ləməntuŋ"), Place = 10)      0.0000000 0.4567901
+optimized weights 61 92 51 26 54 38 20 40 31 38 66 72 60          0.0000000 0.5604938
+aline(c("ũmlatʃ","dinnira"), c("omlatʃ","diŋŋira"))               0.07647059 0.10810811
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Fix 1: out-of-bounds read in `src/alineR.cpp` (2026-11-14)
+
+**Problem.** CRAN's valgrind run reported `Invalid read of size 4` at
+`exchange (alineR.cpp:19)`. `raw.alignment()` passes 12 feature weights
+(Syllabic ... Round), and the skip penalty separately. The C++ copied 13:
+
+```cpp
+int vec[13]; for(int i=0;i<13;i++) vec[i]=INTEGER(coeff)[i];
+```
+
+so it read one integer past the end of the R vector. The 13th value was never
+used as a weight (feature indices run 0-11), so results were unaffected, but
+reading outside the vector is undefined behaviour.
+
+**Fix.** Read exactly 12 values and reject anything else:
+
+```cpp
+if (TYPEOF(coeff) != INTSXP || LENGTH(coeff) != 12)
+    Rf_error("feature weights must be an integer vector of length 12");
+int vec[12]; for(int i=0;i<12;i++) vec[i]=INTEGER(coeff)[i];
+```
+
+**GitHub:** [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) (diff against the [untouched baseline](https://github.com/Guowei-Sun-Meta/research/commit/d07e559fc542a93e33a9c6c4595bccf5d4323b10)).
+
+**Verified.** All reference outputs identical to step 0. Passing 13 weights now
+gives an R error. `R CMD check` unchanged (`1 WARNING, 3 NOTEs`), as expected
+since this bug only shows under valgrind. Final confirmation needs a valgrind
+run (rhub `valgrind` platform), since valgrind is not available on macOS.
+
