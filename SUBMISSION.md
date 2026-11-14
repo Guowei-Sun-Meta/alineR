@@ -14,6 +14,20 @@ tinytex::install_tinytex()   # LaTeX, for the PDF manual check
 Also needed: pandoc (bundled with RStudio) and, on macOS, the Xcode command line
 tools (`xcode-select --install`).
 
+If the check reports `pdflatex is not available` (ERROR/WARNING for the PDF
+manual, plus a NOTE about `alineR-manual.tex`), TinyTeX is installed but not on
+the `PATH`. Either run `sudo ~/Library/TinyTeX/bin/universal-darwin/tlmgr path add`,
+or, without admin rights, add this line to `~/.Renviron` and restart R:
+
+```text
+PATH="${HOME}/Library/TinyTeX/bin/universal-darwin:${PATH}"
+```
+
+The NOTE "'tidy' doesn't look like recent enough HTML Tidy" is local only (macOS
+ships a 2006 `tidy`); CRAN has a current one. To skip it locally:
+`_R_CHECK_RD_VALIDATE_RD2HTML_=false R CMD check --as-cran ...`, or install
+[tidy-html5](https://www.html-tidy.org/).
+
 ## 1. Get the source and build
 
 ```bash
