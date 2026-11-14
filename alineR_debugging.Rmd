@@ -1,0 +1,32 @@
+---
+title: "alineR 2026"
+output:
+  html_document:
+    df_print: paged
+date: "2026-11-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Context
+This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages/alineR/index.html) back to CRAN. Last check from CRAN is [here](http://cran-archive.r-project.org/web/checks/2021/2021-04-21_check_results_alineR.html).
+
+
+## alineR Debugging Log
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
