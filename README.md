@@ -24,4 +24,4 @@ Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Me
 | 4 | Two moved URLs | NOTE | Fixed | [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b) |
 | 5 | Invalid package alias `aline-package` | NOTE | Fixed | [c26891b](https://github.com/Guowei-Sun-Meta/research/commit/c26891b3f482cc6fcc4c4473cb10c56e71fa4e38) |
 | 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Fixed | [4aef4e2](https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da) |
-| 7 | Buffer overflow on long words | Wrong results / crash | Open |  |
+| 7 | Buffer overflow on long words | Wrong results / crash | Fixed | [75aff80](https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b) |

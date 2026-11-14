@@ -53,7 +53,7 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | 4 | Two URLs moved (301): Kondrak homepage, R Journal article | WARNING, CRAN incoming feasibility | Open |
 | 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Fixed (2026-11-14) |
-| 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Open |
+| 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
 
 ### Step 0: baseline (2026-11-14)
 
@@ -148,3 +148,52 @@ from the `prompt()` template.
 is the CRAN incoming one ("New submission / Package was archived on CRAN"),
 which every resubmission of an archived package gets and which is explained
 in the submission comments rather than fixed.
+
+### Fix 7: C++ buffer overflow on long words (2026-11-14)
+
+**Problem.** Found locally with AddressSanitizer; CRAN never saw it because no
+example uses a long word. Fixed-size C++ buffers did not fit each other:
+
+| Buffer | Old size | Needed |
+|:--|:--|:--|
+| input copy (`alineR.cpp`) | `char s1[20]`, filled by `strcpy` | word length + 1 |
+| alignment output | `char aback[50]` | 4 chars per aligned position |
+| trace stack / DP matrix (`MAXL`) | 40 | `lenA + lenB + 2` |
+| word representation (`ELEN`) | 30 | word length + 1 |
+
+Words are measured after encoding (e.g. `ŋ` becomes `gN`). Probe aligning a
+word with itself (`raw.alignment(c(w, w))`), unmodified code:
+
+```text
+n= 10  segments in alignment= 10  identical rows=TRUE      correct
+n= 11  segments in alignment=  0  identical rows=FALSE     corrupted
+n= 15  segments in alignment=  3  identical rows=FALSE     corrupted
+n= 20  (R session crashed)
+ASan:  stack-buffer-overflow in Stack::showAlign, from n = 11
+```
+
+Scores were not affected, only the alignment strings (and the crash).
+
+**Fix.** One limit, every buffer derived from it (`src/glob.h`):
+
+```cpp
+const int ELEN = 61;              // max encoded word length + 1
+const int PLEN = ELEN + 2;        // phonemic length
+const int MAXL = 2 * ELEN + 4;    // alignment has <= lenA + lenB + 2 entries
+const int ABACK = TAB * MAXL + 1; // output: <= TAB chars per entry
+```
+
+In `src/alineR.cpp` the words are no longer copied into `char[20]`; words of
+more than 60 encoded characters raise an R error, and the output buffers are
+`char[ABACK]`. Array parameters are declared `char *` instead of `char[50]`.
+
+**GitHub:** [75aff80](https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b)
+
+**Verified.**
+
+- Probe: every length 8-60 aligns correctly (all segments present, identical
+  rows); 61+ gives `word too long: at most 60 encoded characters are supported`.
+- ASan/UBSan clean on the probe, on worst-case pairs (two unrelated 60-character
+  words: 486 output chars, limit 505) and on 150 random pairs with skip penalties
+  -100, 0, 100.
+- Paper reference outputs identical to step 0. `R CMD check`: `1 NOTE` (unchanged).
