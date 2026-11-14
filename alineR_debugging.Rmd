@@ -54,7 +54,7 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Fixed (2026-11-14) |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
-| 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Open |
+| 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Fixed (2026-11-14) |
 | 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Open |
 | 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Open |
 | 11 | `ALINE.segments()` recomputes segments with hard-coded default weights, so it returns `"Error"` for any non-default weights | Correctness check | Open |
@@ -237,3 +237,37 @@ Issue 12 is real but deliberately not fixed in 1.1.5: correcting the skip
 penalty changes every published ALINE distance, including those in the R
 Journal paper.
 
+### Fix 8: invalid input reached the C++ unchecked (2026-11-14)
+
+**Problem.** The C++ guards its input with `assert()`, but R compiles packages
+with `-DNDEBUG`, so the checks never run. Under UBSan:
+
+| Input | Example | 1.1.4 behaviour |
+|:--|:--|:--|
+| empty word | `aline("ÈÈ", "ta")` (all characters unknown, dropped) | write to `phon[-1]`, garbage result |
+| word starting with a modifier or `@` | `raw.alignment(c("Nta","ta"))`, `aline("Èta","ta", mark = TRUE)` | write to `phon[-1]` |
+| NA weight | `raw.alignment(c("ta","ta"), Place = NA)` | signed integer overflow |
+| NA word | `raw.alignment(c(NA,"ta"))` | aligns the literal text `"NA"` |
+
+All returned a value silently.
+
+**Fix.** `exchange()` in `src/alineR.cpp` rejects exactly these cases with an
+R error:
+
+```text
+word 1 is empty (were all of its characters invalid?)
+word 1 must start with a known segment (encoded a-z), not 'N'
+word 1 is NA
+feature weights must not be NA
+skip penalty must be a single non-missing number
+```
+
+Unknown codes after the first character remain ignored, as in 1.1.4. That is
+how the `@` placeholder of `aline(mark = TRUE)` works, so it keeps working for
+unknown characters inside a word.
+
+**GitHub:** [34e5433](https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d)
+
+**Verified.** UBSan/ASan clean on all malformed inputs and all examples.
+Paper reference outputs and the full differential test (1,500 pairs, all
+exported functions) identical to fix 7. `R CMD check`: `1 NOTE` (unchanged).

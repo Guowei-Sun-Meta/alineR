@@ -1724,7 +1724,7 @@ modifier, unknown code such as <code>@</code>, NA weights) reaches the
 C++ unchecked: out-of-bounds write (<code>phon[-1]</code>), integer
 overflow, silent garbage</td>
 <td align="left">Correctness check (UBSan)</td>
-<td align="left">Open</td>
+<td align="left">Fixed (2026-11-14)</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
@@ -1958,6 +1958,68 @@ raw.alignment(c(&quot;watu&quot;,&quot;dat&quot;), sk = s)          sk = 0: 50, 
 <p>Issue 12 is real but deliberately not fixed in 1.1.5: correcting the
 skip penalty changes every published ALINE distance, including those in
 the R Journal paper.</p>
+</div>
+<div id="fix-8-invalid-input-reached-the-c-unchecked-2026-11-14" class="section level3">
+<h3>Fix 8: invalid input reached the C++ unchecked (2026-11-14)</h3>
+<p><strong>Problem.</strong> The C++ guards its input with
+<code>assert()</code>, but R compiles packages with
+<code>-DNDEBUG</code>, so the checks never run. Under UBSan:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Input</th>
+<th align="left">Example</th>
+<th align="left">1.1.4 behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">empty word</td>
+<td align="left"><code>aline(&quot;ÈÈ&quot;, &quot;ta&quot;)</code> (all characters unknown,
+dropped)</td>
+<td align="left">write to <code>phon[-1]</code>, garbage result</td>
+</tr>
+<tr class="even">
+<td align="left">word starting with a modifier or <code>@</code></td>
+<td align="left"><code>raw.alignment(c(&quot;Nta&quot;,&quot;ta&quot;))</code>,
+<code>aline(&quot;Èta&quot;,&quot;ta&quot;, mark = TRUE)</code></td>
+<td align="left">write to <code>phon[-1]</code></td>
+</tr>
+<tr class="odd">
+<td align="left">NA weight</td>
+<td align="left"><code>raw.alignment(c(&quot;ta&quot;,&quot;ta&quot;), Place = NA)</code></td>
+<td align="left">signed integer overflow</td>
+</tr>
+<tr class="even">
+<td align="left">NA word</td>
+<td align="left"><code>raw.alignment(c(NA,&quot;ta&quot;))</code></td>
+<td align="left">aligns the literal text <code>&quot;NA&quot;</code></td>
+</tr>
+</tbody>
+</table>
+<p>All returned a value silently.</p>
+<p><strong>Fix.</strong> <code>exchange()</code> in
+<code>src/alineR.cpp</code> rejects exactly these cases with an R
+error:</p>
+<pre class="text"><code>word 1 is empty (were all of its characters invalid?)
+word 1 must start with a known segment (encoded a-z), not &#39;N&#39;
+word 1 is NA
+feature weights must not be NA
+skip penalty must be a single non-missing number</code></pre>
+<p>Unknown codes after the first character remain ignored, as in 1.1.4.
+That is how the <code>@</code> placeholder of
+<code>aline(mark = TRUE)</code> works, so it keeps working for unknown
+characters inside a word.</p>
+<p><strong>GitHub:</strong> <a href="https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d">34e5433</a></p>
+<p><strong>Verified.</strong> UBSan/ASan clean on all malformed inputs
+and all examples. Paper reference outputs and the full differential test
+(1,500 pairs, all exported functions) identical to fix 7.
+<code>R CMD check</code>: <code>1 NOTE</code> (unchanged).</p>
 </div>
 </div>
 
