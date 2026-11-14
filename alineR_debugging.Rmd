@@ -354,3 +354,21 @@ contribution inside the full alignment once weights change. It also errors on
 alignments without two `|` borders (`(ind[1] + 1):(ind[2] - 1) : NA/NaN
 argument`). The segment scores should come from the C++ alignment itself.
 
+### Correctness check, part 2: final 1.1.5 (2026-11-14)
+
+Fresh build of the final 1.1.5 (package identical to the state after fix 8).
+All checks are in `checks/` and rerun with `bash checks/run_checks.sh` (macOS).
+
+| Check | Result |
+|:--|:--|
+| `R CMD check --as-cran` (R 4.6.2, macOS) | `Status: 1 NOTE` (CRAN incoming: new submission / archived) |
+| Paper worked examples (7) | identical to the published values |
+| Differential test vs 1.1.4 (1,500 random pairs, all exported functions) | 11 of 12 output groups identical; weighted alignments: 1.1.5 valid 1,500/1,500, 1.1.4 valid 1,493/1,500 (issue 7) |
+| ASan/UBSan: all examples, words of 8-100 encoded characters, worst-case pairs, 150 random pairs, malformed input | 0 sanitizer reports; too long, empty, NA and malformed words give R errors |
+
+Not covered locally: valgrind (not available on macOS). Fix 1 is a read past
+the end of an R vector inside R's own memory pool, which ASan cannot see; it is
+verified by the length check in the code and should be confirmed with the R-hub
+`valgrind` platform before submission (`SUBMISSION.md`, step 3). Not tested:
+R-devel and Windows (win-builder, also step 3).
+

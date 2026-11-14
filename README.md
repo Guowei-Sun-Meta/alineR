@@ -10,6 +10,8 @@ Bringing [alineR](https://cran.r-project.org/package=alineR) back to CRAN (archi
 | `alineR_archive/alineR_1.1.4/` | Original CRAN 1.1.4 source, untouched (reference) |
 | `alineR_archive/alineR_1.1.4.tar.gz` | Original CRAN 1.1.4 tarball (for `install.packages(..., repos = NULL)`) |
 | `alineR_debugging.Rmd` | Debugging log: details and verification of each fix |
+| `SUBMISSION.md` | Steps to check and submit 1.1.5 to CRAN |
+| `checks/` | Correctness checks (`bash checks/run_checks.sh`) |
 | `alineR_ An R Package ... .pdf` | The R Journal paper (2017) |
 
 ## Issues

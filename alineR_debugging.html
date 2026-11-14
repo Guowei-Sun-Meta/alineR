@@ -2103,6 +2103,54 @@ alignments without two <code>|</code> borders
 (<code>(ind[1] + 1):(ind[2] - 1) : NA/NaN argument</code>). The segment
 scores should come from the C++ alignment itself.</p>
 </div>
+<div id="correctness-check-part-2-final-1.1.5-2026-11-14" class="section level3">
+<h3>Correctness check, part 2: final 1.1.5 (2026-11-14)</h3>
+<p>Fresh build of the final 1.1.5 (package identical to the state after
+fix 8). All checks are in <code>checks/</code> and rerun with
+<code>bash checks/run_checks.sh</code> (macOS).</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Check</th>
+<th align="left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>R CMD check --as-cran</code> (R 4.6.2,
+macOS)</td>
+<td align="left"><code>Status: 1 NOTE</code> (CRAN incoming: new
+submission / archived)</td>
+</tr>
+<tr class="even">
+<td align="left">Paper worked examples (7)</td>
+<td align="left">identical to the published values</td>
+</tr>
+<tr class="odd">
+<td align="left">Differential test vs 1.1.4 (1,500 random pairs, all
+exported functions)</td>
+<td align="left">11 of 12 output groups identical; weighted alignments:
+1.1.5 valid 1,500/1,500, 1.1.4 valid 1,493/1,500 (issue 7)</td>
+</tr>
+<tr class="even">
+<td align="left">ASan/UBSan: all examples, words of 8-100 encoded
+characters, worst-case pairs, 150 random pairs, malformed input</td>
+<td align="left">0 sanitizer reports; too long, empty, NA and malformed
+words give R errors</td>
+</tr>
+</tbody>
+</table>
+<p>Not covered locally: valgrind (not available on macOS). Fix 1 is a
+read past the end of an R vector inside R’s own memory pool, which ASan
+cannot see; it is verified by the length check in the code and should be
+confirmed with the R-hub <code>valgrind</code> platform before
+submission (<code>SUBMISSION.md</code>, step 3). Not tested: R-devel and
+Windows (win-builder, also step 3).</p>
+</div>
 </div>
 
 

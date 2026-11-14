@@ -1,0 +1,5 @@
+CFLAGS=-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer
+CXXFLAGS=-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX11FLAGS=-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer
+CXX17FLAGS=-g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer
+LDFLAGS=-fsanitize=address,undefined
