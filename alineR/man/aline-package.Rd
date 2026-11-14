@@ -15,8 +15,8 @@ To cite 'alineR' in a publication please use:
 \tabular{ll}{
 Package: \tab alineR\cr
 Type: \tab package\cr
-Version: \tab 1.1.4\cr
-Date: \tab 2017-9-12\cr
+Version: \tab 1.1.5\cr
+Date: \tab 2026-11-14\cr
 License: \tab GPL-3\cr
 }
 }

@@ -11,5 +11,5 @@ bibentry(
   volume = 9,
   number = 1,
   pages = "138--152",
-  note="R Package Version 1.1.4" 
+  note="R Package Version 1.1.5" 
 )
