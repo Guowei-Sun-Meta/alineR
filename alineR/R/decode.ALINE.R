@@ -7,26 +7,18 @@ function(x,y,m1=NULL,m2=NULL) {
   map<-map(m1,m2)
   splitx<-strsplit(x,"")
   splity<-strsplit(y,"")    
-  t<-splitx[[1]]   
-  for(j in 1:length(splitx[[1]])){
-    catch<-FALSE
-    for(i in 1:length(map$U.Val)){
-      if(splitx[[1]][j]==intToUtf8(map$U.Val[i])){
-        catch=TRUE
-        break
-      }
-    }
-    if(!catch){
-      message(paste("Invalid character:",splitx[[1]][j],"dropped in alignment"))
-      t<-splitx[[1]][-j]
-    }
+  # drop every character without a mapping (previously t<-splitx[[1]][-j]
+  # restarted from the full word each time, so only the last one was dropped)
+  valid<-splitx[[1]] %in% intToUtf8(map$U.Val, multiple=TRUE)
+  for(ch in splitx[[1]][!valid]){
+    message(paste("Invalid character:",ch,"dropped in alignment"))
   }
-  splitx[[1]]<-t
+  splitx[[1]]<-splitx[[1]][valid]
   num<-length(splity[[1]])
   J<-rep(NA,length(splitx[[1]]))  
   j=1    
   
-  for( i in 1:num-1)
+  for( i in seq_len(num-1))  # was 1:num-1, i.e. 0:(num-1)
   {
     if (!splity[[1]][i]==" " && splity[[1]][i+1]==" ")
     {
