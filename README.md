@@ -20,8 +20,8 @@ Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Me
 |:--|:--|:--|:--|:--|
 | 1 | C++ reads 13 weights from a 12-element vector | Caused archival (valgrind) | Fixed | [64e665a](https://github.com/Guowei-Sun-Meta/research/commit/64e665a35c220b6bad4863df4433625d935b1226) |
 | 2 | Examples write CSV files to the working directory | Caused archival | Fixed | [e2be357](https://github.com/Guowei-Sun-Meta/research/commit/e2be357472108219030bc46bc96923018b47035d) |
-| 3 | Version equals archived 1.1.4 | Blocks resubmission | Open |  |
-| 4 | Two moved URLs | WARNING | Open |  |
+| 3 | Version equals archived 1.1.4 | Blocks resubmission | Fixed | [5f016bf](https://github.com/Guowei-Sun-Meta/research/commit/5f016bf371c70c1564dd4ccb1c3502db1fe4a7c5) |
+| 4 | Two moved URLs | NOTE | Open |  |
 | 5 | Invalid package alias `aline-package` | NOTE | Open |  |
 | 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Open |  |
 | 7 | Buffer overflow on long words | Wrong results / crash | Open |  |
