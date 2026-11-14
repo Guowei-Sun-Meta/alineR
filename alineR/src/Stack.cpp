@@ -39,7 +39,7 @@ void Stack::show()
 }
 
 
-void Stack::showAlign( Word *w, short row, char aback[50] )
+void Stack::showAlign( Word *w, short row, char *aback )
 //void Stack::showAlign( Word *w, short row)
 {
     short len = w->phlen();

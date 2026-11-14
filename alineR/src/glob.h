@@ -30,7 +30,6 @@
 #include <math.h>
 #include <time.h>
 
-const int MAXL = 40;        // max length of an input word
 const int LINELEN = 800;    // max input line length
 const int MAXS = 2400;      // max input size (in lines)
 const int BASE_UPP = 65;    // = ord('A')
@@ -40,8 +39,13 @@ const int NUL = -1;         // empty alignment
 const int LIM = -2;         // border character (for local comparison)
 const int DUB = -3;         // double linking (for compression)
 const int TAB = 4;          // output space for one phoneme
-const int PLEN = 42;        // max word phonemic length (+2)
-const int ELEN = 30;        // max word representation length
+// Buffer sizes, all derived from ELEN so they stay consistent (were fixed at
+// ELEN 30 / MAXL 40 / output 50, which overflowed for words of ~11+ chars).
+const int ELEN = 61;            // max encoded word length + 1 (for '\0')
+const int PLEN = ELEN + 2;      // max word phonemic length (+2)
+const int MAXL = 2 * ELEN + 4;  // alignment trace length and DP matrix size
+                                // (an alignment has <= lenA + lenB + 2 entries)
+const int ABACK = TAB * MAXL + 1; // alignment output buffer: <= TAB chars per entry
 const int NSEG = 26;        // number of recognized segments
 
 #endif

@@ -12,10 +12,15 @@ extern "C"{
   SEXP exchange(SEXP s, SEXP coeff, SEXP skpen){
     //first line is for test  int a=20;char aback1[20];char aback2[20];strcpy(aback1,"tu");strcpy(aback2,"tuF");printf("look at the returns:\n");printf("%s %s %d\n",aback1,aback2,a);
     
-    // now we have to deal with the input, give the string value to two vectors
-    char s1[20], s2[20];
-    strcpy(s1,CHAR(STRING_ELT(s,0)));
-    strcpy(s2,CHAR(STRING_ELT(s,1)));
+    // The words used to be strcpy()'d into char[20] buffers and the C++ code
+    // assumed short words; longer ones overflowed its buffers. Check the
+    // length against the (now consistent) limit ELEN instead.
+    if (TYPEOF(s) != STRSXP || LENGTH(s) != 2)
+        Rf_error("expected a character vector of two words");
+    const char *s1 = CHAR(STRING_ELT(s,0));
+    const char *s2 = CHAR(STRING_ELT(s,1));
+    if (strlen(s1) >= (size_t) ELEN || strlen(s2) >= (size_t) ELEN)
+        Rf_error("word too long: at most %d encoded characters are supported", ELEN - 1);
     // R passes 12 feature weights (Syllabic ... Round); the skip penalty
     // arrives separately in skpen. The old code read 13 values here, one
     // past the end of the vector (CRAN valgrind: "Invalid read of size 4").
@@ -28,8 +33,9 @@ extern "C"{
         int *score;
         score=&a;
         //int vec[12]={1,2,3,4,5,6,7,8,9,0,11,12};
-        char aback1[50];
-        char aback2[50];
+        char aback1[ABACK];
+        char aback2[ABACK];
+        aback1[0] = aback2[0] = '\0';
 
         Word::applyRedundancyRules();
         Word* w1 = new Word(s1);

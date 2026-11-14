@@ -153,7 +153,7 @@ Word::Word( const char *w )
 
 // Display external representation sequence corresponding to
 // an individual phoneme.
-int Word::flush( short wi, char aback[50], int abackcount )
+int Word::flush( short wi, char *aback, int abackcount )
 //void Word::flush( short wi )
 {
     assert( wi >= 0 && wi < len );
