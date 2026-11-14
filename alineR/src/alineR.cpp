@@ -16,7 +16,12 @@ extern "C"{
     char s1[20], s2[20];
     strcpy(s1,CHAR(STRING_ELT(s,0)));
     strcpy(s2,CHAR(STRING_ELT(s,1)));
-    int vec[13]; for(int i=0;i<13;i++) vec[i]=INTEGER(coeff)[i]; //printf("%d\n",vec[11]);
+    // R passes 12 feature weights (Syllabic ... Round); the skip penalty
+    // arrives separately in skpen. The old code read 13 values here, one
+    // past the end of the vector (CRAN valgrind: "Invalid read of size 4").
+    if (TYPEOF(coeff) != INTSXP || LENGTH(coeff) != 12)
+        Rf_error("feature weights must be an integer vector of length 12");
+    int vec[12]; for(int i=0;i<12;i++) vec[i]=INTEGER(coeff)[i];
     int SkipPen=INTEGER(skpen)[0];     //printf("the skip penalty input:%d\n",SkipPen);
 
         int a=0;
