@@ -54,6 +54,11 @@ R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 | 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Fixed (2026-11-14) |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Fixed (2026-11-14) |
+| 8 | Invalid input (empty word, word starting with a modifier, unknown code such as `@`, NA weights) reaches the C++ unchecked: out-of-bounds write (`phon[-1]`), integer overflow, silent garbage | Correctness check (UBSan) | Open |
+| 9 | Native routines never registered: init function is named `R_init_markovchain` (copy-paste) | Correctness check | Open |
+| 10 | `decode.ALINE()` drops only the last invalid character, so the decoded alignment shows wrong letters | Correctness check | Open |
+| 11 | `ALINE.segments()` recomputes segments with hard-coded default weights, so it returns `"Error"` for any non-default weights | Correctness check | Open |
+| 12 | Skip penalty `sk` is added to the score (a bonus) on the internal x100 scale; Kondrak's original subtracts 10 points | Correctness check | Deferred: fixing changes published results |
 
 ### Step 0: baseline (2026-11-14)
 
@@ -197,3 +202,38 @@ more than 60 encoded characters raise an R error, and the output buffers are
   words: 486 output chars, limit 505) and on 150 random pairs with skip penalties
   -100, 0, 100.
 - Paper reference outputs identical to step 0. `R CMD check`: `1 NOTE` (unchanged).
+
+### Correctness check, part 1 (2026-11-14)
+
+After fixes 1-7, every exported function was compared between the original
+1.1.4 and the fixed version, and run under AddressSanitizer/UBSan.
+
+**Differential test** (1,500 random IPA word pairs of at most 10 encoded
+characters, 1,500 random weight vectors, plus `encode.ALINE`, `decode.ALINE`,
+`ALINE.segments`, custom mappings, `generate.training`, `optimize.features`,
+`optimization.GA` with fixed seeds): all outputs identical, except 7 of the
+1,500 weighted alignments. In those 7, 1.1.4 returned an empty `alignment1`:
+alignments with many skips exceed the old 50-character output buffer even for
+short words (issue 7). Structural check (each alignment row contains exactly
+its word's letters): 1.1.4 valid 1,493/1,500, fixed version 1,500/1,500.
+
+**Sanitizers.** All package examples clean. Malformed input found issue 8:
+R compiles packages with `-DNDEBUG`, so the C++ `assert()` checks are disabled
+and invalid words go through. UBSan: `index -1 out of bounds` (`Word.cpp:220`)
+for an empty word or one starting with a modifier, e.g. `aline("ÈÈ", "ta")`
+where all characters are unknown; `signed integer overflow` (`Word.cpp:292`)
+for `NA` weights.
+
+**Review of R functions** (each confirmed by running it): issues 9-12.
+
+```text
+decode.ALINE("tÈaÈ", <alignment of "ta">)        "|  t   È   |"    should be t a
+ALINE.segments(raw.alignment(c("pat","tak"), Place = 90, Voice = 80),
+               Place = 90, Voice = 80)          "Error"
+raw.alignment(c("watu","dat"), sk = s)          sk = 0: 50, 10: 50, 100: 52, 1000: 75
+```
+
+Issue 12 is real but deliberately not fixed in 1.1.5: correcting the skip
+penalty changes every published ALINE distance, including those in the R
+Journal paper.
+

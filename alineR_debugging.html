@@ -1717,6 +1717,45 @@ give corrupted alignments; ~25+ crash R</td>
 checks</td>
 <td align="left">Fixed (2026-11-14)</td>
 </tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">Invalid input (empty word, word starting with a
+modifier, unknown code such as <code>@</code>, NA weights) reaches the
+C++ unchecked: out-of-bounds write (<code>phon[-1]</code>), integer
+overflow, silent garbage</td>
+<td align="left">Correctness check (UBSan)</td>
+<td align="left">Open</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">Native routines never registered: init function is
+named <code>R_init_markovchain</code> (copy-paste)</td>
+<td align="left">Correctness check</td>
+<td align="left">Open</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left"><code>decode.ALINE()</code> drops only the last invalid
+character, so the decoded alignment shows wrong letters</td>
+<td align="left">Correctness check</td>
+<td align="left">Open</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left"><code>ALINE.segments()</code> recomputes segments with
+hard-coded default weights, so it returns <code>&quot;Error&quot;</code> for any
+non-default weights</td>
+<td align="left">Correctness check</td>
+<td align="left">Open</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">Skip penalty <code>sk</code> is added to the score (a
+bonus) on the internal x100 scale; Kondrak’s original subtracts 10
+points</td>
+<td align="left">Correctness check</td>
+<td align="left">Deferred: fixing changes published results</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1885,6 +1924,40 @@ with skip penalties -100, 0, 100.</li>
 <li>Paper reference outputs identical to step 0.
 <code>R CMD check</code>: <code>1 NOTE</code> (unchanged).</li>
 </ul>
+</div>
+<div id="correctness-check-part-1-2026-11-14" class="section level3">
+<h3>Correctness check, part 1 (2026-11-14)</h3>
+<p>After fixes 1-7, every exported function was compared between the
+original 1.1.4 and the fixed version, and run under
+AddressSanitizer/UBSan.</p>
+<p><strong>Differential test</strong> (1,500 random IPA word pairs of at
+most 10 encoded characters, 1,500 random weight vectors, plus
+<code>encode.ALINE</code>, <code>decode.ALINE</code>,
+<code>ALINE.segments</code>, custom mappings,
+<code>generate.training</code>, <code>optimize.features</code>,
+<code>optimization.GA</code> with fixed seeds): all outputs identical,
+except 7 of the 1,500 weighted alignments. In those 7, 1.1.4 returned an
+empty <code>alignment1</code>: alignments with many skips exceed the old
+50-character output buffer even for short words (issue 7). Structural
+check (each alignment row contains exactly its word’s letters): 1.1.4
+valid 1,493/1,500, fixed version 1,500/1,500.</p>
+<p><strong>Sanitizers.</strong> All package examples clean. Malformed
+input found issue 8: R compiles packages with <code>-DNDEBUG</code>, so
+the C++ <code>assert()</code> checks are disabled and invalid words go
+through. UBSan: <code>index -1 out of bounds</code>
+(<code>Word.cpp:220</code>) for an empty word or one starting with a
+modifier, e.g. <code>aline(&quot;ÈÈ&quot;, &quot;ta&quot;)</code> where all characters are
+unknown; <code>signed integer overflow</code>
+(<code>Word.cpp:292</code>) for <code>NA</code> weights.</p>
+<p><strong>Review of R functions</strong> (each confirmed by running
+it): issues 9-12.</p>
+<pre class="text"><code>decode.ALINE(&quot;tÈaÈ&quot;, &lt;alignment of &quot;ta&quot;&gt;)        &quot;|  t   È   |&quot;    should be t a
+ALINE.segments(raw.alignment(c(&quot;pat&quot;,&quot;tak&quot;), Place = 90, Voice = 80),
+               Place = 90, Voice = 80)          &quot;Error&quot;
+raw.alignment(c(&quot;watu&quot;,&quot;dat&quot;), sk = s)          sk = 0: 50, 10: 50, 100: 52, 1000: 75</code></pre>
+<p>Issue 12 is real but deliberately not fixed in 1.1.5: correcting the
+skip penalty changes every published ALINE distance, including those in
+the R Journal paper.</p>
 </div>
 </div>
 
