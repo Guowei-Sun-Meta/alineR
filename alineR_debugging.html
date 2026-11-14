@@ -1731,14 +1731,16 @@ overflow, silent garbage</td>
 <td align="left">Native routines never registered: init function is
 named <code>R_init_markovchain</code> (copy-paste)</td>
 <td align="left">Correctness check</td>
-<td align="left">Fixed (2026-11-14)</td>
+<td align="left">Deferred to 1.2.0 (fix in 5a93f72, reverted from
+1.1.5)</td>
 </tr>
 <tr class="even">
 <td align="left">10</td>
 <td align="left"><code>decode.ALINE()</code> drops only the last invalid
 character, so the decoded alignment shows wrong letters</td>
 <td align="left">Correctness check</td>
-<td align="left">Fixed (2026-11-14)</td>
+<td align="left">Deferred to 1.2.0 (fix in d238edd, reverted from
+1.1.5)</td>
 </tr>
 <tr class="odd">
 <td align="left">11</td>
@@ -1746,7 +1748,7 @@ character, so the decoded alignment shows wrong letters</td>
 hard-coded default weights, so it returns <code>&quot;Error&quot;</code> for any
 non-default weights</td>
 <td align="left">Correctness check</td>
-<td align="left">Open</td>
+<td align="left">Deferred to 1.2.0</td>
 </tr>
 <tr class="even">
 <td align="left">12</td>
@@ -1754,7 +1756,8 @@ non-default weights</td>
 bonus) on the internal x100 scale; Kondrak’s original subtracts 10
 points</td>
 <td align="left">Correctness check</td>
-<td align="left">Deferred: fixing changes published results</td>
+<td align="left">Deferred to 1.2.0: fixing changes published
+results</td>
 </tr>
 </tbody>
 </table>
@@ -2023,6 +2026,9 @@ and all examples. Paper reference outputs and the full differential test
 </div>
 <div id="fix-9-native-routine-never-registered-2026-11-14" class="section level3">
 <h3>Fix 9: native routine never registered (2026-11-14)</h3>
+<p><strong>Moved to 1.2.0.</strong> Scope decision: 1.1.5 contains fixes
+1-8 only. This fix was reverted from 1.1.5 in <a href="https://github.com/Guowei-Sun-Meta/research/commit/2a1a14b70c6e479fb3529640a8d156b8181837b3">2a1a14b</a>
+and will be re-applied in 1.2.0.</p>
 <p><strong>Problem.</strong> <code>src/registerDynamicsSymbol.c</code>
 defined <code>R_init_markovchain</code>, a name copied from another
 package. R calls <code>R_init_&lt;package&gt;</code> on load, i.e.
@@ -2053,6 +2059,9 @@ and “compiled code” OK.</p>
 <div id="fix-10-decode.aline-dropped-only-the-last-invalid-character-2026-11-14" class="section level3">
 <h3>Fix 10: <code>decode.ALINE()</code> dropped only the last invalid
 character (2026-11-14)</h3>
+<p><strong>Moved to 1.2.0.</strong> Scope decision: 1.1.5 contains fixes
+1-8 only. This fix was reverted from 1.1.5 in <a href="https://github.com/Guowei-Sun-Meta/research/commit/354e7de42d563c37f4ce901c74a43a841a602b29">354e7de</a>
+and will be re-applied in 1.2.0.</p>
 <p><strong>Problem.</strong> <code>decode.ALINE()</code> maps an encoded
 alignment back to the IPA word, first dropping characters that have no
 mapping. The loop did <code>t &lt;- splitx[[1]][-j]</code>, restarting
@@ -2077,6 +2086,22 @@ splitx[[1]] &lt;- splitx[[1]][valid]</code></pre>
 reference outputs and the differential test (words without invalid
 characters) identical to fix 9. <code>R CMD check</code>:
 <code>1 NOTE</code>.</p>
+</div>
+<div id="scope-of-1.1.5-2026-11-14" class="section level3">
+<h3>Scope of 1.1.5 (2026-11-14)</h3>
+<p>1.1.5 contains fixes 1-8: the two archival causes (1, 2), what blocks
+a resubmission (3-6), and the memory-safety bugs (7, 8). Issues 9-12
+move to 1.2.0. Fixes 9 and 10 were reverted, so the package is identical
+to the state after fix 8.</p>
+<p><strong>Issue 11, notes for 1.2.0.</strong> Passing the weights
+through (the obvious fix) is not enough: <code>ALINE.segments()</code>
+still returns <code>&quot;Error&quot;</code> for non-default weights, in 1.1.4 and
+with the change. It rescores each aligned pair as an independent
+two-segment alignment, which does not reproduce the pair’s contribution
+inside the full alignment once weights change. It also errors on
+alignments without two <code>|</code> borders
+(<code>(ind[1] + 1):(ind[2] - 1) : NA/NaN argument</code>). The segment
+scores should come from the C++ alignment itself.</p>
 </div>
 </div>
 

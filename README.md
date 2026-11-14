@@ -26,9 +26,9 @@ Each fix is one commit on top of the [baseline](https://github.com/Guowei-Sun-Me
 | 6 | Template keywords `~kwd1`, `~kwd2` | NOTE | Fixed | [4aef4e2](https://github.com/Guowei-Sun-Meta/research/commit/4aef4e24863106c9808d5881a30cbc200d5595da) |
 | 7 | Buffer overflow on long words | Wrong results / crash | Fixed | [75aff80](https://github.com/Guowei-Sun-Meta/research/commit/75aff803e0318e3b7f580107ca237783272a294b) |
 | 8 | Invalid input (empty word, bad code, NA weight) reaches C++ unchecked | Out-of-bounds write / garbage | Fixed | [34e5433](https://github.com/Guowei-Sun-Meta/research/commit/34e543340c09444c3f863a028863ca3d4a623c3d) |
-| 9 | Native routines never registered (`R_init_markovchain`) | Package hygiene | Fixed | [5a93f72](https://github.com/Guowei-Sun-Meta/research/commit/5a93f72b09e7a84f7a51abb7f6bb38a743f5905a) |
-| 10 | `decode.ALINE()` drops only the last invalid character | Wrong decoded alignment | Fixed | [d238edd](https://github.com/Guowei-Sun-Meta/research/commit/d238edd86e5447d03969d6d4233db5e0ede4314d) |
-| 11 | `ALINE.segments()` ignores its weight arguments | Returns `"Error"` | Open |  |
-| 12 | Skip penalty `sk` is added, not subtracted, and on a x100 scale | Changes published results | Deferred |  |
+| 9 | Native routines never registered (`R_init_markovchain`) | Package hygiene | 1.2.0 | fix ready: [5a93f72](https://github.com/Guowei-Sun-Meta/research/commit/5a93f72) |
+| 10 | `decode.ALINE()` drops only the last invalid character | Wrong decoded alignment | 1.2.0 | fix ready: [d238edd](https://github.com/Guowei-Sun-Meta/research/commit/d238edd) |
+| 11 | `ALINE.segments()` ignores its weight arguments | Returns `"Error"` | 1.2.0 |  |
+| 12 | Skip penalty `sk` is added, not subtracted, and on a x100 scale | Changes published results | 1.2.0 |  |
 
-Issues 8-12 were found in the correctness check (see log). 12 is left for a decision with Sean, since fixing it changes every published ALINE distance.
+**1.1.5 = fixes 1-8.** Issues 8-12 were found in the correctness check (see log); 9-12 are deferred to 1.2.0. Fixes 9 and 10 were made and then reverted from 1.1.5 ([354e7de](https://github.com/Guowei-Sun-Meta/research/commit/354e7de42d563c37f4ce901c74a43a841a602b29), [2a1a14b](https://github.com/Guowei-Sun-Meta/research/commit/2a1a14b70c6e479fb3529640a8d156b8181837b3)); their commits can be re-applied in 1.2.0. 12 needs a decision with Sean, since fixing it changes every published ALINE distance.
