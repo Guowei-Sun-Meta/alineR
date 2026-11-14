@@ -50,7 +50,7 @@ R CMD check --as-cran --no-manual alineR_<version>.tar.gz   # 1.1.4 until fix 3,
 | 1 | C++ reads 13 feature weights from a 12-element vector | CRAN valgrind (cause of archival) | Fixed (2026-11-14) |
 | 2 | Examples write `candidate_alignments.csv`, `open.with.excel.csv` into the working directory | CRAN NOTE (cause of archival) | Fixed (2026-11-14) |
 | 3 | Version 1.1.4 equals the archived version | WARNING, CRAN incoming feasibility | Fixed (2026-11-14) |
-| 4 | Two URLs moved (301): Kondrak homepage, R Journal article | NOTE, CRAN incoming feasibility (part of the WARNING before fix 3) | Open |
+| 4 | Two URLs moved (301): Kondrak homepage, R Journal article | NOTE, CRAN incoming feasibility (part of the WARNING before fix 3) | Fixed (2026-11-14) |
 | 5 | Invalid package alias `aline-package` | NOTE, Rd metadata | Open |
 | 6 | Template keywords `~kwd1`, `~kwd2` in `features.plot.Rd`, `optimization.GA.Rd` | NOTE, Rd contents | Open |
 | 7 | C++ buffer overflow: words of ~12+ encoded characters give corrupted alignments; ~25+ crash R | Found locally (AddressSanitizer); not in CRAN checks | Open |
@@ -161,3 +161,28 @@ The earlier, discarded fix attempt's git tag `alineR-1.1.5` and branch
 **Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs` (was `1 WARNING, 2 NOTEs`).
 The incoming-feasibility check is now a NOTE: the expected "New submission /
 Package was archived on CRAN" text, plus the moved URLs (issue 4).
+
+### Fix 4: moved URLs (2026-11-14)
+
+**Problem.** The CRAN incoming check listed two URLs answering
+`301 Moved Permanently`: the R Journal article
+(`https://journal.r-project.org/archive/2017/RJ-2017-005/index.html`, in
+`DESCRIPTION`, `man/aline-package.Rd`, `inst/CITATION`) and Kondrak's homepage
+(`http://webdocs.cs.ualberta.ca/~kondrak/`, in `man/aline-package.Rd`).
+
+**Fix.**
+
+- R Journal article: replaced by its DOI, `10.32614/RJ-2017-005`
+  (`<doi:...>` in `DESCRIPTION`, `\doi{}` in Rd, `doi =` in `CITATION`).
+  CRAN prefers DOIs, and DOIs are not flagged when the publisher moves pages.
+- Kondrak's homepage now answers `410 Gone` with no successor, so the link is
+  dropped; the acknowledgement stays.
+- Same category, not flagged by CRAN: the 2008 reference had a malformed
+  `doi://dx.doi.org/...` (now `\doi{10.1080/09296170802326681}`), and the
+  `DESCRIPTION` text was missing a closing parenthesis.
+
+**GitHub:** [36d02b5](https://github.com/Guowei-Sun-Meta/research/commit/36d02b5b6add27adcb9487f1c9bf9ea6e7eb7e6b)
+
+**Verified.** `R CMD check`: `0 WARNINGs, 3 NOTEs`; the incoming NOTE no
+longer lists URLs, only the expected "New submission / Package was archived on
+CRAN". `citation("alineR")` and the package help page show working DOIs.
