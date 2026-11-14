@@ -16,7 +16,7 @@ Description: Functions are provided to calculate the 'ALINE' Distance between wo
     features weights are used to determine the optimal alignment and functions are
     provided to estimate optimum values using a genetic algorithm and supervised 
     learning. See (Downey, Sun, and Norquest 2017, 
-    <https://journal.r-project.org/archive/2017/RJ-2017-005/index.html>.
+    <doi:10.32614/RJ-2017-005>).
 License: GPL-3
 NeedsCompilation: yes
 Author: Sean Downey [aut, cre],
