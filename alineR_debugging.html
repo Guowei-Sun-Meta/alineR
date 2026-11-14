@@ -1633,8 +1633,18 @@ back to CRAN. Last check from CRAN is <a href="http://cran-archive.r-project.org
 We used Claude Opus 5.5 for debugging and fixing, with manual validation
 of reproducibility and CRAN package checks.</p>
 </div>
-<div id="aliner-debugging-log" class="section level2">
-<h2>alineR Debugging Log</h2>
+<div id="aliner-replay-and-debugging-log" class="section level2">
+<h2>alineR Replay and Debugging Log</h2>
+<p>Install archived package</p>
+<pre class="r"><code>install.packages(&quot;~/Documents/research/alineR/alineR_archive/alineR_1.1.4.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)
+library(alineR)</code></pre>
+<p>Confirm we can reproduce previous results</p>
+<pre class="r"><code>aline(&quot;kərampu&quot;, &quot;ləməntuŋ&quot;)
+aline(c(&quot;batu&quot;,&quot;kərampu&quot;), c(&quot;batʊ&quot;,&quot;ləməntuŋ&quot;))
+aline(&quot;watu&quot;, &quot;dat&quot;, sim = TRUE) 
+ALINE.segments(raw.alignment(c(&quot;watu&quot;,&quot;dat&quot;))) 
+aline(c(&quot;batu&quot;,&quot;kərampu&quot;), c(&quot;batʊ&quot;,&quot;ləməntuŋ&quot;), Place = 10) 
+aline(c(&quot;ũmlatʃ&quot;,&quot;dinnira&quot;), c(&quot;omlatʃ&quot;,&quot;diŋŋira&quot;))  </code></pre>
 <p>Working copy: <code>alineR/alineR/</code> (copied from the untouched
 CRAN source in <code>alineR_archive/alineR_1.1.4/</code>). Each fix is
 checked with:</p>

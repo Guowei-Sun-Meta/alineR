@@ -4,6 +4,8 @@ output:
   html_document:
     df_print: paged
 date: "2026-11-13"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -13,8 +15,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Context
 This is a log of fixes to bring [alineR](https://cran.r-project.org/web/packages/alineR/index.html) back to CRAN. Last check from CRAN is [here](http://cran-archive.r-project.org/web/checks/2021/2021-04-21_check_results_alineR.html). We used Claude Opus 5.5 for debugging and fixing, with manual validation of reproducibility and CRAN package checks.
 
+## alineR Replay and Debugging Log
+Install archived package 
+```R
+install.packages("~/Documents/research/alineR/alineR_archive/alineR_1.1.4.tar.gz", repos = NULL, type = "source")
+library(alineR)
+```
 
-## alineR Debugging Log
+Confirm we can reproduce previous results
+```R
+aline("kərampu", "ləməntuŋ")
+aline(c("batu","kərampu"), c("batʊ","ləməntuŋ"))
+aline("watu", "dat", sim = TRUE) 
+ALINE.segments(raw.alignment(c("watu","dat"))) 
+aline(c("batu","kərampu"), c("batʊ","ləməntuŋ"), Place = 10) 
+aline(c("ũmlatʃ","dinnira"), c("omlatʃ","diŋŋira"))  
+```
+
 
 Working copy: `alineR/alineR/` (copied from the untouched CRAN source in
 `alineR_archive/alineR_1.1.4/`). Each fix is checked with:
@@ -23,6 +40,8 @@ Working copy: `alineR/alineR/` (copied from the untouched CRAN source in
 R CMD build alineR
 R CMD check --as-cran --no-manual alineR_1.1.4.tar.gz
 ```
+
+
 
 ### Issue list
 
